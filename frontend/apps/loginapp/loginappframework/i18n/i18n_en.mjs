@@ -58,7 +58,7 @@ export const i18n = {
 "ProfileChangedFailedOTP": "Profile update failed due to a bad one time code.",
 "ProfileChangedFailedSecurityError": "Profile update failed due to a security error.",
 "ProfileChangedFailedDomainError": "Profile update failed due to ID containing a domain that's not allowed.",
-"Register" : "Register",
+"Register" : "REGISTER",
 "Modify" : "Modify",
 "LoginTaken" : "Login ID taken",
 "PasswordTooShort" : "Password too short",
