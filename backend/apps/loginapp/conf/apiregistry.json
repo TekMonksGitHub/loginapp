@@ -22,6 +22,7 @@
     "/apps/{{app}}/approveuser" : "/loginappframework/apis/approveuser.js?get=true&keys=fheiwu98237hjief8923ydewjidw834284hwqdnejwr79389&needsToken=admin&checkClaims=org",
     "/apps/{{app}}/getorgsmatching" : "/loginappframework/apis/getorgsmatching.js?get=true&keys=fheiwu98237hjief8923ydewjidw834284hwqdnejwr79389&needsToken=false",
     "/apps/{{app}}/verifyemail" : "/loginappframework/apis/verifyemail.js?keys=fheiwu98237hjief8923ydewjidw834284hwqdnejwr79389&needsToken=false",
+    "/apps/{{app}}/approveemail" : "/loginappframework/apis/approveemail.js?keys=fheiwu98237hjief8923ydewjidw834284hwqdnejwr79389&needsToken=false",
     "/apps/{{app}}/addorupdateorg" : "/loginappframework/apis/addorupdateorg.js?keys=fheiwu98237hjief8923ydewjidw834284hwqdnejwr79389&needsToken=admin&checkClaims=org&addsToken=sub:{{{role}}},tokenflag:{{{result}}},id:{{{id}}},org:{{{org}}}",
     "/apps/{{app}}/orgkeys" : "/loginappframework/apis/orgkeys.js?keys=fheiwu98237hjief8923ydewjidw834284hwqdnejwr79389&needsToken=admin&checkClaims=org",
 
