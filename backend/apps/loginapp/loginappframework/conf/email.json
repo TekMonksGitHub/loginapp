@@ -60,5 +60,9 @@
     "ja_approvedaccountemail_text": "こんにちは {{name}}\n\nあなたのアカウントは承認されました。 ログイン ID は {{id}} です。\n\nこの URL を新しいブラウザ ウィンドウに貼り付けて、アカウントにログインしてください。\n{{{action_url}}}\n\nありがとうございます。\nTekmonks ログイン チーム。",
 
     "button_code_pre": "<table border='0' width='100%' cellspacing='0' cellpadding='0'><tbody><tr><td><table border='0' cellspacing='0' cellpadding='0'><tbody><tr><td style='border-radius: 3px;' align='center' bgcolor='#0492c2'><a style='font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 3px; padding: 12px 18px; border: 1px solid #0492c2; display: inline-block;' href='{{{action_url}}}' target='_blank' rel='noopener'>",
-    "button_code_post": " &rarr;</a></td></tr></tbody></table></td></tr></tbody></table>"
+    "button_code_post": " &rarr;</a></td></tr></tbody></table></td></tr></tbody></table>",
+    
+    "en_unknown_title":"Unknown Email Registered",
+    "en_unknown_html":"<p>Hello,</p><p>An unknown email has registered in Loginapp: {{id}} <br><p align='center'>{{{button_code_pre}}}Approve Account{{{button_code_post}}}</p><br> The Tekmonks Login Team.</p>",
+    "en_unknown_text": "Hello {{name}}\n\nAn unknown email has registered in Loginapp: {{id}}\n\nPaste this URL into a new browser window to approve the account\n{{{action_url}}}\n\nThank you,\nThe Tekmonks Login Team."
 }

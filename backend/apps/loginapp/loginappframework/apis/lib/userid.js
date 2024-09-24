@@ -138,6 +138,10 @@ exports.approve = async (id, org) => {
 	return {result: await db.runCmd("UPDATE users SET approved=1 WHERE id=? and org=?", [id, org])};
 }
 
+exports.approveUnknown = async (id) => {
+	return {result: await db.runCmd("UPDATE users SET approved=1 WHERE id=?", [id])};
+}
+
 exports.verifyEmail = async id => {
 	return {result: await db.runCmd("UPDATE users SET verified=1 WHERE id=? AND verified=0", [id])};
 }
@@ -180,7 +184,7 @@ exports.shouldAllowDomain = async domain => {
 	// blacklist check
 	const isSubdomainOrMainDomainInBlacklist = ID_BLACK_WHITE_LISTS.blacklist.includes(domain.toLowerCase()) || 
 		ID_BLACK_WHITE_LISTS.blacklist.includes((orgMainDomain||domain).toLowerCase());
-	if (APP_CONSTANTS.CONF.id_blacklist_mode) return (!isSubdomainOrMainDomainInBlacklist);	
+    if (APP_CONSTANTS.CONF.id_blacklist_mode) return (!isSubdomainOrMainDomainInBlacklist);
 }
 
 exports.shouldAllowNewMainDomainForOrg = async domain => {
