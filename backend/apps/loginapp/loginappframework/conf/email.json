@@ -63,6 +63,6 @@
     "button_code_post": " &rarr;</a></td></tr></tbody></table></td></tr></tbody></table>",
     
     "en_unknown_title":"Unknown Email Registered",
-    "en_unknown_html":"<p>Hello,</p><p>An unknown email has registered in Loginapp: {{id}} <br><p align='center'>{{{button_code_pre}}}Approve Account{{{button_code_post}}}</p><br> The Tekmonks Login Team.</p>",
-    "en_unknown_text": "Hello {{name}}\n\nAn unknown email has registered in Loginapp: {{id}}\n\nPaste this URL into a new browser window to approve the account\n{{{action_url}}}\n\nThank you,\nThe Tekmonks Login Team."
+    "en_unknown_html":"<p>Hello,</p><p>A new user {{id}} from a new organization {{org}} has registered. <br> Click here to approve the user and the organization as well <br><p align='center'>{{{button_code_pre}}}Approve Account{{{button_code_post}}}</p><br> The Tekmonks Login Team.</p>",
+    "en_unknown_text": "Hello {{name}}\n\nA new user {{id}} from a new organization {{org}} has registered. \n\n Click here to approve the user and the organization as well\n\nPaste this URL into a new browser window to approve the account\n{{{action_url}}}\n\nThank you,\nThe Tekmonks Login Team."
 }

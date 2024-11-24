@@ -43,7 +43,7 @@ export const APP_CONSTANTS = {
     API_REGISTER: API_PATH+"/register",
     API_UPDATE: API_PATH+"/updateuser",
     API_VERIFY_EMAIL: API_PATH+"/verifyemail",
-    API_APPROVE_EMAIL: API_PATH+"/approveemail",
+    API_APPROVE_USER: API_PATH+"/approveuser",
 
     API_STATUS: API_PATH+"/setstatus",
     API_CHANGEPW: API_PATH+"/changepassword",
@@ -67,6 +67,8 @@ export const APP_CONSTANTS = {
 
     SEARCH_PARAM_BGC: "bgc",
     SESSION_VARIABLE_BGC: "bgc",
+    SEARCH_PARAM_MANAGE: "manage",
+    SESSION_VARIABLE_MANAGE: "manage",
 
     "DEFAULT_BGC": "#4FB4ED",
 

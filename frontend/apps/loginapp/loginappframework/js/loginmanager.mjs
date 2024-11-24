@@ -13,7 +13,9 @@ const LOGOUT_LISTENERS = "__loginmanager_logout_listeners", TIMEOUT_CURRENT = "_
 
 function init() {
     const currenturl = new URL(router.getCurrentURL()), 
-        backgroundColorActive = currenturl.searchParams.get(APP_CONSTANTS.SEARCH_PARAM_BGC) || APP_CONSTANTS.DEFAULT_BGC;
+        backgroundColorActive = currenturl.searchParams.get(APP_CONSTANTS.SEARCH_PARAM_BGC) || APP_CONSTANTS.DEFAULT_BGC,
+        isManage = currenturl.searchParams.get(APP_CONSTANTS.SEARCH_PARAM_MANAGE) || false;
+    session.set(APP_CONSTANTS.SESSION_VARIABLE_MANAGE, isManage);
     session.set(APP_CONSTANTS.SESSION_VARIABLE_BGC, backgroundColorActive);
 }
 
@@ -145,7 +147,7 @@ function startAutoLogoutTimer() { return;
 const interceptPageLoadData = _ => {
     const routeToCallerOnSuccessfulLoginAndRegistration = async data => {
         const urlIncoming = new URL(router.getCurrentURL()), searchParams = urlIncoming.searchParams, search = urlIncoming.search;
-        data.routeonsuccess = searchParams.get(APP_CONSTANTS.SEARCH_PARAM_REDIRECT) ? APP_CONSTANTS.REROUTE_HTML+search : 
+        data.routeonsuccess = session.get(APP_CONSTANTS.SESSION_VARIABLE_MANAGE) ?  APP_CONSTANTS.MANAGE_HTML : searchParams.get(APP_CONSTANTS.SEARCH_PARAM_REDIRECT) ? APP_CONSTANTS.REROUTE_HTML+search : 
             APP_CONSTANTS.MAIN_HTML;
     }
 

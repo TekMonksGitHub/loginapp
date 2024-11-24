@@ -9,8 +9,10 @@ import {router} from "/framework/js/router.mjs";
 import {apimanager as apiman} from "/framework/js/apimanager.mjs";
 
 const interceptPageData = _ => router.addOnLoadPageData(APP_CONSTANTS.APPROVE_HTML, async (data, url) => {   // approve email
-    const urlParsed = new URL(url), e = urlParsed.searchParams.get("e"), t = urlParsed.searchParams.get("t"),
-        approveResult = (e && t) ? await apiman.rest(APP_CONSTANTS.API_APPROVE_EMAIL, "POST", {e, t}) : {result: false};
+    const urlParsed = new URL(url), id = urlParsed.searchParams.get("id"), org = urlParsed.searchParams.get("org"), approveOrg = urlParsed.searchParams.get("approveOrg"), 
+        name = urlParsed.searchParams.get("name"), lang = urlParsed.searchParams.get("lang"), bgc = urlParsed.searchParams.get("bgc");
+        
+    const approveResult = (id && org) ? await apiman.rest(APP_CONSTANTS.API_APPROVE_USER, "GET", {id, name, org, approveOrg, bgc}, true) : {result: false};
         
     if (approveResult && approveResult.result) {
         data.emailApproveMsg = await i18n.get("EmailApproved"); 
