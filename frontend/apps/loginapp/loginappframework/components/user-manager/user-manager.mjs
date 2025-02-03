@@ -13,7 +13,7 @@ import {monkshu_component} from "/framework/js/monkshu_component.mjs";
 const CONTEXT_MENU_ID = "usermanagerContextMenu", API_GETORGUSERS = "getorgusers", API_DELETEUSER = "deleteuser",
 	API_APPROVEUSER = "approveuser", API_EDITUSER = "updateuserbyadmin", API_RESETUSER = "resetuser", 
 	API_ADDUSER = "adduserbyadmin", COMPONENT_PATH = util.getModulePath(import.meta), API_GETORG = "getorg",
-	API_UPDATE_ORG = "addorupdateorg", API_ORGKEYS = "orgkeys";
+	API_UPDATE_ORG = "addorupdateorg", API_ORGKEYS = "orgkeys", API_GETNEWORGUSERS = "getneworgusers";
 
 let conf, mustache_instance;
 
@@ -25,6 +25,7 @@ async function elementConnected(element) {
 	if (!usersResult?.result) {LOG.error("Can't fetch the list of users for the org, API returned false.");}
 
 	const users = usersResult?.users||[], data = _createData(element, users);
+	
 	user_manager.setDataByHost(element, data);
 
 	user_manager.getMemory(element.id).users = users;
@@ -55,6 +56,15 @@ async function userMenuClicked(event, element, name, id, _org, role, approved) {
 	const menus = {}; menus[await i18n.get("Edit")] = _=>editUser(name, id, role, approved, element); 
 	menus[await i18n.get("Delete")] = _ => _deleteUser(name, id, element); menus[await i18n.get("Reset")] = _ => _resetUser(name, id, element);
 	if (approved == 0) menus[await i18n.get("Approve")] = _=>_approveUser(name, id, element);
+	CONTEXT_MENU.showMenu(CONTEXT_MENU_ID, menus, event.pageX, event.pageY, 2, 2);
+}
+
+async function newUserMenuClicked(event, element, name, id, _org, role, approved) {
+	console.log(event, element, name, id, _org, role, approved)
+	const CONTEXT_MENU = window.monkshu_env.components["context-menu"];
+	const menus = {}; 
+	menus[await i18n.get("Delete")] = _ => _deleteUser(name, id, element);
+	if (approved == 0) menus[await i18n.get("Approve")] = _=>_approveUser(name, id, element, _org);
 	CONTEXT_MENU.showMenu(CONTEXT_MENU_ID, menus, event.pageX, event.pageY, 2, 2);
 }
 
@@ -116,6 +126,16 @@ async function editUser(name, old_id, role, approved, element) {
 			user_manager.reload(user_manager.getHostElementID(element));
 		}
 	});
+}
+
+async function showNewOrganizations() {
+	const backendURL = user_manager.getHostElement(document.querySelector("user-manager")).getAttribute("backendurl");
+	const newOrgUsersResult = await apiman.rest(`${backendURL}/${API_GETNEWORGUSERS}`, "GET", {}, true);
+	
+	if (!newOrgUsersResult?.result) return;
+
+	const dialogBox = monkshu_env.components['dialog-box'];
+	dialogBox.showDialog(`${COMPONENT_PATH}/dialogs/neworganization.html`, false, true, {users: newOrgUsersResult.users, COMPONENT_PATH}, "dialog", ["orgname"]);
 }
 
 async function editOrg(org, element) {
@@ -226,11 +246,12 @@ async function _resetUser(name, id, element) {
 	});
 }
 
-async function _approveUser(name, id, element) {
-	const backendURL = user_manager.getHostElement(element).getAttribute("backendurl");
+async function _approveUser(name, id, element, newOrg = null) {
+	const dialogElement = user_manager.getHostElement(element);
+	const backendURL = user_manager.getHostElement(dialogElement).getAttribute("backendurl");
 	const approve_request = {id, name,
 		lang: i18n.getSessionLang(), org: session.get(conf.userorg_session_variable).toString(), 
-		bgc: session.get(conf.userbackcolor_session_variable).toString()};
+		bgc: session.get(conf.userbackcolor_session_variable).toString(), neworg: newOrg};
 	const approveResult = await apiman.rest(`${backendURL}/${API_APPROVEUSER}`, "GET", approve_request, true);
 	if (!approveResult?.result) {
 		const err = mustache_instance.render(await i18n.get("ApproveError"), {name, id}); 
@@ -248,6 +269,9 @@ function _createData(host, users) {
 	if (host.getAttribute("styleBody")) data.styleBody = `<style>${host.getAttribute("styleBody")}</style>`;
 	if (users) data.users = users;
 	data.CONF = conf;
+	const profile = JSON.parse(JSON.stringify(session.get(conf.user_profile)));
+	const isAdmin = profile.id == conf.tekmonks_admin_email;
+	data.isAdmin = isAdmin;
 
 	return data;
 }
@@ -268,10 +292,10 @@ const _execOnConfirm = (message, cb) => {
 	if (cb) monkshu_env.components['dialog-box'].showDialog(`${COMPONENT_PATH}/dialogs/message.html`, 
 		true, true, {message, CONF:conf}, "dialog", [], _=>{monkshu_env.components['dialog-box'].hideDialog("dialog"); cb();});
 	else return new Promise(resolve => monkshu_env.components['dialog-box'].showDialog(
-		`${COMPONENT_PATH}/dialogs/message.html`, true, true, {message, CONF:conf}, "dialog", [],
+		`${COMPONENT_PATH}/dialogs/message.html`, true, true, {message, CONF:conf}, "dialog", [], 
 		_=>{monkshu_env.components['dialog-box'].hideDialog("dialog"); resolve(true)}, _=>resolve(false)));
 }
 
-export const user_manager = {trueWebComponentMode: true, elementConnected, userMenuClicked, orgMenuClicked, addUser, 
-	editUser, editOrg, searchModified, elementRendered, editAPIKeys, newAPIKey}
+export const user_manager = {trueWebComponentMode: true, elementConnected, userMenuClicked, newUserMenuClicked, orgMenuClicked, addUser, 
+	editUser, editOrg, searchModified, elementRendered, editAPIKeys, newAPIKey, showNewOrganizations}
 monkshu_component.register("user-manager", `${COMPONENT_PATH}/user-manager.html`, user_manager);

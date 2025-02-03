@@ -342,6 +342,13 @@ exports.deleteDomain = async (domain, migrateUsersToMainDomain, mainDomain) => {
 	return {result: domainDeletionResult, domain};
 }
 
+exports.getNewOrgUsers = async (whitelistedDomains) => {
+	const query = `SELECT * FROM users WHERE LOWER(SUBSTR(id, INSTR(id, '@') + 1)) NOT IN (${whitelistedDomains.map(() => '?').join(', ')})
+        AND approved = 0`;
+    const users = await db.getQuery(query, whitelistedDomains);
+    if (users && users.length) return users; else return [];
+}
+
 const _unique_ignorecase_array = array => {
 	const retArray = [], lowerCaseArray = []; for (const element of array) 
 		if (!lowerCaseArray.includes(element.toString().toLowerCase())) {retArray.push(element); lowerCaseArray.push(element.toString().toLowerCase());}

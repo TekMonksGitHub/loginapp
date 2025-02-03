@@ -13,10 +13,10 @@ exports.doService = async jsonReq => {
 	if (!validateRequest(jsonReq)) {LOG.error("Validation failure."); return CONSTANTS.FALSE_RESULT;}
 	
 	LOG.debug(`Got approve user request for ID ${jsonReq.id}`);
-
-	const result = await userid.approve(jsonReq.id, jsonReq.org);
+	const org = jsonReq.neworg || jsonReq.org;
+	const result = await userid.approve(jsonReq.id, org);
 	
-	if(jsonReq.approveOrg) addDomainToWhitelist(jsonReq.id);
+	if(jsonReq.neworg) addDomainToWhitelist(jsonReq.id);
 
 	if (result.result) {
 		LOG.info(`User ${jsonReq.name} with ID ${jsonReq.id} for org ${jsonReq.org} approved.`); 
