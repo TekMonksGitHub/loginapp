@@ -121,6 +121,25 @@ div.user > img {
     margin-left: auto;
     margin-right: auto;
 }
+    
+div.neworg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 6em;
+    margin: 1.2em;
+    -webkit-touch-callout: none !important; 
+    -webkit-user-select: none !important;
+    user-select: none;
+}
+
+div.neworg > span {
+    text-align: center;
+    cursor: default;
+    font-size: small;
+    width: 100%;
+}
+
 </style>
 {{{CONF.MOBILE_MEDIA_QUERY_START}}}
     span#header > input {margin-right: 0em; max-width: calc(100% - 9em);}
@@ -171,6 +190,15 @@ div.user > img {
             <span>{{id}}</span>
         </div>
         {{/users}}
+        {{#isAdmin}}
+            <div class="neworg" ontouchend='event.preventDefault(); event.stopPropagation();
+                        event.pageY = event.changedTouches[0].pageY; event.pageX = event.changedTouches[0].pageX; oncontextmenu(event)'
+                        ondblclick='event.preventDefault(); event.stopPropagation();  monkshu_env.components["user-manager"].showNewOrganizations(
+                        "{{name}}", "{{id}}","{{role}}", "{{approved}}", this)'>
+                        <img src="{{COMPONENT_PATH}}/img/neworg.svg" height="50" width="50">
+                        <span>New Organization</span>
+            </div>
+        {{/isAdmin}}
     </div>
 </div>
 

@@ -4,6 +4,7 @@
     "initiallogin_url": "https://{{{hostname}}}/apps/{{{app}}}/loginappframework/initiallogin.html",
     "base_url": "https://{{{hostname}}}/apps/{{{app}}}/loginappframework/index.html?.=",
     "login_url": "https://{{{hostname}}}/apps/{{{app}}}/loginappframework/login.html",
+    "approve_url": "https://{{{hostname}}}/apps/{{{app}}}/loginappframework/approve.html",
     "reset_expiry_time": 43200000,
     "remote_log": true,
     "max_logins_to_remember": 45,
@@ -11,10 +12,12 @@
     "verify_email_on_registeration": true,
     "new_users_need_approval_from_admin": true,
     "email_verification_expiry_timeout_hours": 24,
+    "email_approval_expiry_timeout_hours": 24,
     "cleanup_unverified_accounts_frequency": 600000,
     "verifyurl_safe_time_range_seconds": 10,
     "id_blacklist_mode": true,
-    "id_whitelist_mode": true,
+    "id_whitelist_mode": false,
     "transfer_token_timeout": 180000,
-    "jwt_iss": "login.tekmonks.com"
+    "jwt_iss": "login.tekmonks.com",
+    "tekmonks_admin_email": "new_registrations@tekmonks.com"
 }
