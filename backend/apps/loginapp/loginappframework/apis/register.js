@@ -61,9 +61,9 @@ exports.addUser = async (jsonReq, servObject, byAdmin=false) => {
 	else if (!result.result) LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id} exists already.`);
 
 	result.tokenflag = result.result && result.approved == 1 ? true:false;
-
+	LOG.info(JSON.stringify(result));
 	// NEITHER WHITELISTED NOR BLACKLISTED
-	if (result.result && isUnknownEmail) {
+	if (result.result && isUnknownEmail && result.role == "admin") {
 		try {await _emailUnknownEmail(jsonReq.id, jsonReq.name, jsonReq.org, jsonReq.lang, jsonReq.bgc);} 
 		catch (err) {LOG.error(`Unable to send email`);}
 	}
