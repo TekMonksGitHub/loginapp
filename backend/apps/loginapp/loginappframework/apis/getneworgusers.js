@@ -15,7 +15,6 @@ exports.doService = async jsonReq => {
 	const newOrgUsers = await userid.getNewOrgUsers(whitelistedDomains);
 
 	if (newOrgUsers.length) LOG.info(`Sending new org users list.`); else LOG.error(`No new org users found.`);
-    LOG.info(JSON.stringify(newOrgUsers));
 
 	return {result: true, users: newOrgUsers};
 }
