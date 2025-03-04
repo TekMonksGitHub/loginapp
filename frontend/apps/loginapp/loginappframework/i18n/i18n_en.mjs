@@ -107,8 +107,6 @@ export const i18n = {
 "OpenGoogleAuthenticator": "Open Authenticator",
 "EmailVerified": "Email successfully verified.",
 "EmailNotVerified": "Email verification failed.",
-"EmailApproved": "Email successfully approved.",
-"EmailNotApproved": "Email approval failed.",
 "ClickHereToContinueLogin": "Click here to continue to login.",
 "OrgName": "Organization name",
 "OrgAddress": "Organization address",
