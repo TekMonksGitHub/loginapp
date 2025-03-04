@@ -26,7 +26,6 @@ export const APP_CONSTANTS = {
     ERROR_HTML: LOGINAPP_PATH+"/error.html",
     MANAGE_HTML: LOGINAPP_PATH+"/manage.html",
     VERIFY_HTML: LOGINAPP_PATH+"/verify.html",
-    APPROVE_HTML: LOGINAPP_PATH+"/approve.html",
     DOWNLOAD_HTML: LOGINAPP_PATH+"/download.html",
 
     DIALOGS_PATH: LOGINAPP_PATH+"/dialogs",
@@ -79,7 +78,7 @@ export const APP_CONSTANTS = {
         user:[window.location.origin, LOGINAPP_PATH+"/index.html", 
             LOGINAPP_PATH+"/download.html", LOGINAPP_PATH+"/error.html", LOGINAPP_PATH+"/verify.html", 
             LOGINAPP_PATH+"/main.html", LOGINAPP_PATH+"/reset.html", LOGINAPP_PATH+"/initiallogin.html", 
-            LOGINAPP_PATH+"/register.html", LOGINAPP_PATH+"/notapproved.html", LOGINAPP_PATH+"/approve.html", 
+            LOGINAPP_PATH+"/register.html", LOGINAPP_PATH+"/notapproved.html", 
             LOGINAPP_PATH+"/loginroom.html", LOGINAPP_PATH+"/login.html", $$.MONKSHU_CONSTANTS.ERROR_HTML,
             `${EMBEDDED_APP_PATH}/*.html`],
 
@@ -87,12 +86,12 @@ export const APP_CONSTANTS = {
             LOGINAPP_PATH+"/error.html", LOGINAPP_PATH+"/verify.html", LOGINAPP_PATH+"/main.html", 
             LOGINAPP_PATH+"/reset.html", LOGINAPP_PATH+"/initiallogin.html", LOGINAPP_PATH+"/register.html", 
             LOGINAPP_PATH+"/notapproved.html", LOGINAPP_PATH+"/loginroom.html", LOGINAPP_PATH+"/login.html", 
-            LOGINAPP_PATH+"/manage.html", LOGINAPP_PATH+"/approve.html", $$.MONKSHU_CONSTANTS.ERROR_HTML, 
+            LOGINAPP_PATH+"/manage.html", $$.MONKSHU_CONSTANTS.ERROR_HTML, 
             `${EMBEDDED_APP_PATH}/*.html`],
 
         guest:[window.location.origin, LOGINAPP_PATH+"/index.html", LOGINAPP_PATH+"/download.html", 
             LOGINAPP_PATH+"/error.html", LOGINAPP_PATH+"/verify.html", LOGINAPP_PATH+"/reset.html", 
-            LOGINAPP_PATH+"/initiallogin.html", LOGINAPP_PATH+"/register.html", LOGINAPP_PATH+"/approve.html",
+            LOGINAPP_PATH+"/initiallogin.html", LOGINAPP_PATH+"/register.html",
             LOGINAPP_PATH+"/notapproved.html", LOGINAPP_PATH+"/login.html", LOGINAPP_PATH+"/loginroom.html", 
             $$.MONKSHU_CONSTANTS.ERROR_HTML]
     },

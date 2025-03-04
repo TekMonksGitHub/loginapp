@@ -4,7 +4,6 @@
     "initiallogin_url": "https://{{{hostname}}}/apps/{{{app}}}/loginappframework/initiallogin.html",
     "base_url": "https://{{{hostname}}}/apps/{{{app}}}/loginappframework/index.html?.=",
     "login_url": "https://{{{hostname}}}/apps/{{{app}}}/loginappframework/login.html",
-    "approve_url": "https://{{{hostname}}}/apps/{{{app}}}/loginappframework/approve.html",
     "reset_expiry_time": 43200000,
     "remote_log": true,
     "max_logins_to_remember": 45,
