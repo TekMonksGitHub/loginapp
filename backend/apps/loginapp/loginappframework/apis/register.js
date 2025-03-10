@@ -10,6 +10,7 @@ const mailer = require(`${APP_CONSTANTS.LIB_DIR}/mailer.js`);
 const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
 const queueExecutor = require(`${CONSTANTS.LIBDIR}/queueExecutor.js`);
 const emailTemplate = require(`${APP_CONSTANTS.CONF_DIR}/email.json`);
+const ID_BLACK_WHITE_LISTS = require(`${APP_CONSTANTS.CONF_DIR}/idblackwhitelists.json`)
 
 const DEFAULT_QUEUE_DELAY = 500, NEW_USER_LISTENERS_MEMORY_KEY = "__org_monkshu_loginapp_registeration_listeners", 
 	REASONS = {ID_EXISTS: "exists", OTP_ERROR: "otp", INTERNAL_ERROR: "internal", 
@@ -39,20 +40,34 @@ exports.addUser = async (jsonReq, servObject, byAdmin=false) => {
 		LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id}, security error, org and domain mismatch.`);
 		return {...CONSTANTS.FALSE_RESULT, reason: REASONS.SECURITY_ERROR};
 	}
+	
+	const domain = jsonReq.id.indexOf("@") != -1 ? jsonReq.id.substring(jsonReq.id.indexOf("@")+1).toLowerCase() : "undefined";
+	const isUnknownEmail = !ID_BLACK_WHITE_LISTS.whitelist.includes(domain) && !ID_BLACK_WHITE_LISTS.blacklist.includes(domain)
 
 	const rootOrg = await userid.getRootOrgForDomain(exports.getRootDomain(jsonReq)),	// rootOrg is null if domain is whitelisted but first registration for the org
 		existingUsersForThisUsersRootOrg = rootOrg?await userid.getUsersForRootOrg(rootOrg):false,
-		approved = byAdmin ? jsonReq.approved : (APP_CONSTANTS.CONF.new_users_need_approval_from_admin?
-			(existingUsersForThisUsersRootOrg?0:1) : 1),
 		role = byAdmin ? jsonReq.role : (existingUsersForThisUsersRootOrg?"user":"admin"), 
 		verifyEmail = byAdmin ? jsonReq.verifyEmail : (APP_CONSTANTS.CONF.verify_email_on_registeration ? 1 : 0);
-
+		
+	let approved = 0;
+	approved = byAdmin ? jsonReq.approved : (APP_CONSTANTS.CONF.new_users_need_approval_from_admin?
+		(existingUsersForThisUsersRootOrg?0:1) : 1);
+		
+	if(isUnknownEmail) approved = byAdmin ? jsonReq.approved : 0;
+	
 	const result = await userid.register(jsonReq.id, jsonReq.name, jsonReq.org, jsonReq.pwph, jsonReq.totpSecret, role, 
 		approved, verifyEmail, jsonReq.domain);
 	if ((!result) || ((!result.result) && result.reason != userid.ID_EXISTS)) LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id} DB error.`);
 	else if (!result.result) LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id} exists already.`);
 
 	result.tokenflag = result.result && result.approved == 1 ? true:false;
+
+	// NEITHER WHITELISTED NOR BLACKLISTED
+	if (result.result && isUnknownEmail && result.role == "admin") {
+		try {await _emailUnknownEmail(jsonReq.id, jsonReq.name, jsonReq.org, jsonReq.lang, jsonReq.bgc);} 
+		catch (err) {LOG.error(`Unable to send email`);}
+	}
+
 	if (result.result) if (!_informNewUserListners(result)) {	// inform listeners and watch for a veto
 		LOG.error(`Listener veto for id ${jsonReq.id}, for org ${jsonReq.org}. Dropping the ID.`);
 		try {userid.deleteUser(jsonReq.id)} catch(_) {};	// try to drop the account
@@ -124,6 +139,18 @@ exports.addNewUserListener = (modulePath, functionName) => {
 }
 
 exports.REASONS = REASONS;
+
+async function _emailUnknownEmail(id, name, org, lang, bgc) {
+	const action_url = APP_CONSTANTS.CONF.base_url + Buffer.from(`${APP_CONSTANTS.CONF.login_url}${bgc?`?bgc=${encodeURIComponent(bgc)}`:""}&manage=${encodeURIComponent(true)}`).toString("base64"),
+	button_code_pre = mustache.render(emailTemplate.button_code_pre, {action_url}), 
+		button_code_post = mustache.render(emailTemplate.button_code_post, {action_url})
+	
+	const email_title = mustache.render(emailTemplate[`${lang||"en"}_unknown_title`], {name, org}),
+		email_html = mustache.render(emailTemplate[`${lang||"en"}_unknown_html`], {id, name, org, button_code_pre, button_code_post}),
+		email_text = mustache.render(emailTemplate[`${lang||"en"}_unknown_text`], {id, name, org, button_code_pre, button_code_post});
+	
+	return await mailer.email(APP_CONSTANTS.CONF.tekmonks_admin_email, email_title, email_html, email_text);
+}
 
 async function _emailAccountVerification(id, name, org, lang, bgc) {
 	const cryptID = crypt.encrypt(id), cryptTime = crypt.encrypt(utils.getUnixEpoch().toString()), 

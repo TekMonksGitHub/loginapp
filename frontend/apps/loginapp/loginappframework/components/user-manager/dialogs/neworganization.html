@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>New Organization</title>
+	<style>
+		body { font-family: Arial, sans-serif; }
+		.container { padding: 20px; }
+		.label { margin-bottom: 10px; display: block; }
+		.input { width: 100%; padding: 10px; margin-bottom: 20px; }
+		.button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+		.user { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
+		.user img { width: 50px; height: 50px;}
+		.user span { font-size: 12px; }
+		.flex-container { display: flex; flex-wrap: wrap; gap: 20px; }
+	</style>
+</head>
+<body>
+	<div>New Organizations</div>
+	<div class="container">
+		{{#users.length}}
+		<div class="flex-container">
+			{{#users}}
+			<div class="user" oncontextmenu='event.preventDefault(); event.stopPropagation(); monkshu_env.components["user-manager"].newUserMenuClicked(
+                    event, this, "{{name}}", "{{id}}", "{{org}}", "{{role}}", "{{approved}}");'>
+				<img src="{{{COMPONENT_PATH}}}/img/user.svg" alt="User">
+				<span>{{name}}</span>
+				<span>{{org}}</span>
+			</div>
+			{{/users}}
+		</div>
+		{{/users.length}}
+		{{^users.length}}
+		<div>No New Organization</div>
+		{{/users.length}}
+	</div>
+</body>
+</html>
