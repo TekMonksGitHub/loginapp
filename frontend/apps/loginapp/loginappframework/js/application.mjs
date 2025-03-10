@@ -5,26 +5,27 @@
 
 import {i18n} from "/framework/js/i18n.mjs";
 import {util} from "/framework/js/util.mjs";
-import {router} from "/framework/js/router.mjs";
-import {session} from "/framework/js/session.mjs";
-import {securityguard} from "/framework/js/securityguard.mjs";
-import {apimanager as apiman} from "/framework/js/apimanager.mjs";
+import {loadbalancer} from "/framework/js/loadbalancer.mjs";
 import {APP_CONSTANTS as AUTO_APP_CONSTANTS} from "./constants.mjs";
 
+const apiman = $$.libapimanager;
+
 const init = async hostname => {
-	window.monkshu_env.apps[AUTO_APP_CONSTANTS.APP_NAME] = {};
-
-	const mustache = await router.getMustache();
+	window.monkshu_env.apps[AUTO_APP_CONSTANTS.APP_NAME] = AUTO_APP_CONSTANTS.ENV;
+	const mustache = await $$.librouter.getMustache();
 	window.APP_CONSTANTS = JSON.parse(mustache.render(JSON.stringify(AUTO_APP_CONSTANTS), {hostname}));
+	window.LOG = (await import ("/framework/js/log.mjs")).LOG;
+	
+	await _addLoadbalancers();
 
-	window.LOG = window.monkshu_env.frameworklibs.log;
+	if (!$$.libsession.get($$.MONKSHU_CONSTANTS.LANG_ID)) $$.libsession.set($$.MONKSHU_CONSTANTS.LANG_ID, "en");
+	
+	// setup permissions and roles
+	$$.libsecurityguard.setPermissionsMap(APP_CONSTANTS.PERMISSIONS_MAP);
+	$$.libsecurityguard.setCurrentRole($$.libsecurityguard.getCurrentRole() || APP_CONSTANTS.GUEST_ROLE);
 
-	if (!session.get($$.MONKSHU_CONSTANTS.LANG_ID)) session.set($$.MONKSHU_CONSTANTS.LANG_ID, "en");
-
-	securityguard.setPermissionsMap(APP_CONSTANTS.PERMISSIONS_MAP);
-	securityguard.setCurrentRole(securityguard.getCurrentRole() || APP_CONSTANTS.GUEST_ROLE);
-
-	apiman.registerAPIKeys(APP_CONSTANTS.API_KEYS, APP_CONSTANTS.KEY_HEADER); 
+	// register backend API keys
+	apiman.registerAPIKeys(APP_CONSTANTS.API_KEYS, APP_CONSTANTS.KEY_HEADER); 	
 	const API_GETREMOTELOG = APP_CONSTANTS.API_PATH+"/getremotelog", API_REMOTELOG = APP_CONSTANTS.API_PATH+"/log";
 	const remoteLogResponse = (await apiman.rest(API_GETREMOTELOG, "GET")), remoteLogFlag = remoteLogResponse?remoteLogResponse.remote_log:false;
 	LOG.setRemote(remoteLogFlag, API_REMOTELOG);
@@ -35,18 +36,18 @@ const init = async hostname => {
 
 const main = async (desiredURL, desiredData) => {
 	await _addPageLoadInterceptors(); await _readConfig(); await _registerComponents();
-	const decodedURL = new URL(desiredURL || router.decodeURL(window.location.href)), 
+	const decodedURL = new URL(desiredURL || $$.librouter.decodeURL(window.location.href)), 
 		justURL = util.baseURL(decodedURL), search = decodedURL.search, isSearchSpecified = search && (search.trim() != "") && (search.trim() != "?"),
 		startingPage = isSearchSpecified?APP_CONSTANTS.LOGIN_HTML:APP_CONSTANTS.REGISTER_HTML;
 
-	if (justURL == APP_CONSTANTS.INDEX_HTML) router.loadPage(startingPage+search);
-	else if (securityguard.isAllowed(justURL)) {
-		if (router.getLastSessionURL() && (decodedURL.toString() == router.getLastSessionURL().toString())) router.reload();
-		else router.loadPage(decodedURL.href, desiredData);
-	} else router.loadPage(startingPage+search);
+	if (justURL == APP_CONSTANTS.INDEX_HTML) $$.librouter.loadPage(startingPage+search);
+	else if ($$.libsecurityguard.isAllowed(justURL)) {
+		if ($$.librouter.getLastSessionURL() && (decodedURL.toString() == $$.librouter.getLastSessionURL().toString())) $$.librouter.reload();
+		else $$.librouter.loadPage(decodedURL.href, desiredData);
+	} else $$.librouter.loadPage(startingPage+search);
 }
 
-const interceptPageLoadData = _ => router.addOnLoadPageData("*", async (data, _url) => {
+const interceptPageLoadData = _ => $$.librouter.addOnLoadPageData("*", async (data, _url) => {
 	data.APP_CONSTANTS = APP_CONSTANTS; 
 	data.headers = await $$.requireText(APP_CONSTANTS.CONF_PATH+"/headers.html");
 });
@@ -71,12 +72,29 @@ async function _readConfig() {
 const _registerComponents = async _ => { for (const component of APP_CONSTANTS.COMPONENTS) 
 	await import(`${APP_CONSTANTS.APP_PATH}/${component}/${component.substring(component.lastIndexOf("/")+1)}.mjs`); }
 
+
+
 async function _addPageLoadInterceptors() {
-	const interceptors = await(await fetch(`${APP_CONSTANTS.CONF_PATH}/pageLoadInterceptors.json`)).json();
+	const interceptors = await $$.requireJSON(`${APP_CONSTANTS.CONF_PATH}/pageLoadInterceptors.json`);
 	for (const interceptor of interceptors) {
 		const modulePath = interceptor.module, functionName = interceptor.function;
 		let module = await import(`${APP_CONSTANTS.LOGINAPP_PATH}/${modulePath}`); module = module[Object.keys(module)[0]];
 		(module[functionName])();
+	}
+}
+
+async function _addLoadbalancers() {
+	let lbConf; try {lbConf = await $$.requireJSON(`${APP_CONSTANTS.CONF_PATH}/lb.json`)} catch (err) {};
+	if (!lbConf) return;	// no LBs configured
+
+	for (const lbconfKey of Object.keys(lbConf)) {
+		if (lbconfKey == "backends") lbConf[lbconfKey].roothost = new URL(APP_CONSTANTS.BACKEND).hostname;
+		else if (lbconfKey == "frontends") lbConf[lbconfKey].roothost = new URL(APP_CONSTANTS.FRONTEND).hostname;
+		else continue;	// not a known LB configuration
+		
+		const lbThis = loadbalancer.createLoadbalancer(lbConf[lbconfKey]);
+		if (lbThis) {$$.librouter.addLoadbalancer(lbThis); LOG.info(`Added load balancer for policy ${lbconfKey}`);}
+		else LOG.error(`Bad load balancer policy ${lbconfKey}.`);
 	}
 }
 
