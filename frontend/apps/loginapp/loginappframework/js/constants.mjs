@@ -42,6 +42,7 @@ export const APP_CONSTANTS = {
     API_REGISTER: API_PATH+"/register",
     API_UPDATE: API_PATH+"/updateuser",
     API_VERIFY_EMAIL: API_PATH+"/verifyemail",
+    API_APPROVE_USER: API_PATH+"/approveuser",
 
     API_STATUS: API_PATH+"/setstatus",
     API_CHANGEPW: API_PATH+"/changepassword",
@@ -65,6 +66,8 @@ export const APP_CONSTANTS = {
 
     SEARCH_PARAM_BGC: "bgc",
     SESSION_VARIABLE_BGC: "bgc",
+    SEARCH_PARAM_MANAGE: "manage",
+    SESSION_VARIABLE_MANAGE: "manage",
 
     "DEFAULT_BGC": "#4FB4ED",
 
@@ -88,7 +91,7 @@ export const APP_CONSTANTS = {
 
         guest:[window.location.origin, LOGINAPP_PATH+"/index.html", LOGINAPP_PATH+"/download.html", 
             LOGINAPP_PATH+"/error.html", LOGINAPP_PATH+"/verify.html", LOGINAPP_PATH+"/reset.html", 
-            LOGINAPP_PATH+"/initiallogin.html", LOGINAPP_PATH+"/register.html", 
+            LOGINAPP_PATH+"/initiallogin.html", LOGINAPP_PATH+"/register.html",
             LOGINAPP_PATH+"/notapproved.html", LOGINAPP_PATH+"/login.html", LOGINAPP_PATH+"/loginroom.html", 
             $$.MONKSHU_CONSTANTS.ERROR_HTML]
     },
