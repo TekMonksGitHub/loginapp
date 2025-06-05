@@ -50,6 +50,41 @@ async function signin(id, pass, otp) {
     }
 }
 
+async function signinWithGoogle(googleUser) {
+    try {
+        // Extract ID token from Google User object
+        const id_token = googleUser.getAuthResponse().id_token;
+
+        
+        const bgc = session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC);
+        const payload = { id_token, bgc };
+        
+        const resp = await apiman.rest(APP_CONSTANTS.API_LOGIN, "POST", payload, false, true);
+        
+        if (!resp) {
+            LOG.warn(`Google login failed. Null response.`);
+            return loginmanager.ID_INTERNAL_ERROR;
+        }
+
+        
+        if (resp.success) {
+            LOG.info(`Google login succeeded for ${resp.id}`);
+            session.set(APP_CONSTANTS.USERID, resp.id); 
+            session.set(APP_CONSTANTS.USERNAME, resp.name);
+            session.set(APP_CONSTANTS.USERORG, resp.org);
+            session.set(APP_CONSTANTS.CURRENT_USERROLE, resp.role); 
+            session.set(APP_CONSTANTS.USER_NEEDS_VERIFICATION, resp.verified);
+            session.set(APP_CONSTANTS.USERORGDOMAIN, resp.domain);
+            session.set(APP_CONSTANTS.LOGIN_RESPONSE, resp);
+            securityguard.setCurrentRole(resp.role);       
+            return resp.verified?loginmanager.ID_OK:loginmanager.ID_OK_NOT_YET_VERIFIED;
+        } 
+    } catch (err) {
+        LOG.error("Google Sign-In Error:", err);
+        return loginmanager.ID_INTERNAL_ERROR;
+    }
+}
+
 const reset = id => apiman.rest(APP_CONSTANTS.API_RESET, "GET", {id, lang: i18n.getSessionLang(), bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC)});
 
 async function registerOrUpdate(old_id, name=session.get(APP_CONSTANTS.USERNAME), id=session.get(APP_CONSTANTS.USERID), 
@@ -163,6 +198,7 @@ const _stopAutoLogoutTimer = _ => {
 
 export const loginmanager = {init, signin, reset, registerOrUpdate, logout, changepassword, startAutoLogoutTimer, 
     addLogoutListener, getProfileData, checkResetSecurity, getSessionUser, interceptPageLoadData, isAdmin,
+    signinWithGoogle,
     ID_OK: 1, ID_FAILED_EXISTS: -4, ID_FAILED_OTP: -5, ID_OK_NOT_YET_APPROVED: -1, 
     ID_INTERNAL_ERROR: -2, ID_DB_ERROR: -3, ID_OK_NOT_YET_VERIFIED: 2, ID_FAILED_PASSWORD: -6, ID_FAILED_MISSING: -7,
     ID_SECURITY_ERROR: -8, ID_DOMAIN_ERROR: -9};

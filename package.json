@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "google-auth-library": "^9.15.1",
     "bcryptjs": "^2.4.3",
     "mustache": "^4.2.0",
     "sqlite3": "^5.1.6"

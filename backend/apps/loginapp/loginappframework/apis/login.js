@@ -8,6 +8,16 @@ const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
 const register = require(`${APP_CONSTANTS.API_DIR}/register.js`);
 const jwttokenmanager = APIREGISTRY.getExtension("JWTTokenManager");
 const queueExecutor = require(`${CONSTANTS.LIBDIR}/queueExecutor.js`);
+const path = require("path");
+const DB_PATH = path.resolve(`${APP_CONSTANTS.DB_DIR}/loginapp.db`);
+const DB_CREATION_SQLS = require(`${APP_CONSTANTS.DB_DIR}/loginapp_dbschema.json`);
+const db = require(`${CONSTANTS.LIBDIR}/db.js`).getDBDriver("sqlite", DB_PATH, DB_CREATION_SQLS);
+const { OAuth2Client } = require('google-auth-library');
+
+
+
+const GOOGLE_CLIENT_ID = "29460972280-iij9ke0rv6qu2r67u9f5co81h5kh4tp8.apps.googleusercontent.com"; // GoogleSSO client id goes here
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const DEFAULT_QUEUE_DELAY = 500, LOGIN_LISTENERS_MEMORY_KEY = "__org_monkshu_loginapp_login_listeners", 
 	LOGINS_MEMORY_KEY = "__org_monkshu_loginapp_logins", REASONS = { BAD_PASSWORD: "badpw", BAD_ID: "badid", 
@@ -37,6 +47,12 @@ exports.addLoginListener = (modulePath, functionName) => {
 }
 
 exports.doService = async (jsonReq, servObject) => {
+
+	if (jsonReq.id_token) {//indicates Google SSO
+		const result = await verifyGoogleToken(jsonReq);
+		return result;
+	}
+
 	if (!validateRequest(jsonReq)) {LOG.error("Validation failure."); return CONSTANTS.FALSE_RESULT;}
 	
 	LOG.debug(`Got login request for ID ${jsonReq.id}`);
@@ -119,6 +135,117 @@ const _informLoginListeners = async result => {
 	for (const listener of loginlisteners) {
 		const listenerFunction = require(listener.modulePath)[listener.functionName];
 		if (!(await listenerFunction(result))) return false; return true; 
+	}
+}
+
+async function verifyGoogleToken(jsonReq) {
+	LOG.info("Incoming verifyGoogleToken request: " + jsonReq.id_token);
+
+	try {
+		const ticket = await googleClient.verifyIdToken({
+			idToken: jsonReq.id_token,
+			audience: CLIENT_ID
+		});
+
+		const payload = ticket.getPayload();
+		LOG.info("Google token payload: " + JSON.stringify(payload, null, 2));
+
+		const email = payload.email;
+		const domain = payload.hd || "unknown.com";
+		const org = domain.split(".")[0].toLowerCase();
+
+		// Check if user already exists
+		const userExists = await userid.existsID(email);
+		if (userExists.result) {
+			LOG.info(`Existing Google user logging in: ${email}`);
+
+			const userResult = await db.runCmd("SELECT role, approved FROM users WHERE id = ?", [email]);
+			let role = "user";
+			let approved = false;
+			if (userResult.length > 0) {
+				role = userResult[0].role || "user";
+				approved = userResult[0].approved === 1;
+			}
+
+			let res = {
+				success: true,
+				id: email,
+				org: org,
+				role: role,
+				approved: approved,
+				existing: false,
+				name: payload.name,
+				domain: domain,
+				verified: payload.email_verified,
+				tokenflag: true
+			}
+	
+			if (res.tokenflag && (!(await _informLoginListeners(res)))) {	// inform login listeners and give them a chance to veto the login
+			tokenflag = false; res.result = false; 
+			if (res.reason == REASONS.OK || (!res.reason)) res.reason = REASONS.UNKNOWN;	// if the listener didn't add a reason for veto, then make the reason unknown
+		}
+			return res;
+		}
+		// New user registration
+		const rootOrg = await userid.getRootOrg(org);
+		const usersInOrg = await userid.getUsersForRootOrg(rootOrg || org);
+
+		const role = usersInOrg.result === false ? "admin" : "user";
+		const approved = usersInOrg.length === 0 ? 1 : 0;
+
+		// Required fields for registration
+		const name = payload.name || email.split("@")[0];
+		const pwph = "GOOG_SSO"; // Indicates registered using GoogleSSO
+		const totpSecret = "GOOG_SSO"; // Indicates registered using GoogleSSO
+		const verified = 1;
+
+		const registrationResult = await userid.register(
+			email,
+			name,
+			org,
+			pwph,
+			totpSecret,
+			role,
+			approved,
+			verified,
+			domain
+		);
+		
+		if (!registrationResult || !registrationResult.result) {
+			LOG.error(`Google registration failed for ${email}. Reason: ${registrationResult?.reason}`);
+			return {
+				success: false,
+				reason: registrationResult?.reason || "DB registration failed"
+			};
+		}
+
+		LOG.info(`Google user registered: ${email}, org: ${org}, role: ${role}, approved: ${approved === 1}`);
+		let res = {
+			success: true,
+			id: email,
+			org: org,
+			role: role,
+			approved: approved === 1,
+			existing: false,
+			name: payload.name,
+			domain: domain,
+			verified: payload.email_verified,
+			tokenflag: true
+		}
+
+		if (res.tokenflag && (!(await _informLoginListeners(res)))) {	// inform login listeners and give them a chance to veto the login
+		tokenflag = false; res.result = false; 
+		if (res.reason == REASONS.OK || (!res.reason)) res.reason = REASONS.UNKNOWN;	// if the listener didn't add a reason for veto, then make the reason unknown
+	}
+		return res;
+
+	} catch (error) {
+
+		return {
+			success: false,
+			error: error.message || String(error),
+			idToken: jsonReq.id_token
+		};
 	}
 }
 
