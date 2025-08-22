@@ -66,6 +66,8 @@ export const APP_CONSTANTS = {
     SEARCH_PARAM_BGC: "bgc",
     SESSION_VARIABLE_BGC: "bgc",
 
+    GOOGLE_CLIENT_ID:"29460972280-iij9ke0rv6qu2r67u9f5co81h5kh4tp8.apps.googleusercontent.com",//GoogleSSO client Id goes here
+
     "DEFAULT_BGC": "#4FB4ED",
 
     USER_ROLE: "user",

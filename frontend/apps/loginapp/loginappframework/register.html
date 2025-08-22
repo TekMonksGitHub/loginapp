@@ -207,6 +207,18 @@ div.registerbox > span {
 		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}" 
 		mobileQueries='{"start": "{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}", "end": "{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}"}',
 		apiPath='{{APP_CONSTANTS.BACKEND}}/apps/{{APP_CONSTANTS.APP_NAME}}'></register-box>
+		<google-sso-box 
+			routeOnSuccess="{{{routeonsuccess}}}"
+			routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}">
+			<div id="g_id_onload"
+			data-client_id="{{APP_CONSTANTS.GOOGLE_CLIENT_ID}}"
+			data-callback="onGoogleSignIn">
+			</div>
+			<div style="width: 100%; display: flex; justify-content: center; margin-top: 1.5em;">
+				<div class="g_id_signin"></div>
+			</div>
+		</google-sso-box>
+	
 </div>
 </div>
 

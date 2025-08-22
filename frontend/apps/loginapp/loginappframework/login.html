@@ -206,6 +206,18 @@ div.lgbox > span {
 	<login-box routeOnSuccess="{{{routeonsuccess}}}" minlength="{{APP_CONSTANTS.MIN_PASS_LENGTH}}"
 		dataOnSuccessButNotVerified='{"showDialog":{"message": "&#x7B;&#x7B;#needs_verification&#x7D;&#x7D;{{i18n.LoginSuccessNeedsVerification}}&#x7B;&#x7B;/needs_verification&#x7D;&#x7D;&#x7B;&#x7B;^needs_verification&#x7D;&#x7D;{{i18n.RegisterSuccess}}&#x7B;&#x7B;/needs_verification}}"}}'
 		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}"></login-box>
+		<google-sso-box 
+			routeOnSuccess="{{{routeonsuccess}}}"
+			routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}">
+			<div id="g_id_onload"
+			data-client_id="{{APP_CONSTANTS.GOOGLE_CLIENT_ID}}"
+			data-callback="onGoogleSignIn">
+			</div>
+			<div style="width: 100%; display: flex; justify-content: center; margin-top: 1.5em;">
+				<div class="g_id_signin">
+				</div>
+			</div>
+		</google-sso-box>
 </div>
 </div>
 
