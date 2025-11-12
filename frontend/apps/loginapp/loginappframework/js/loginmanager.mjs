@@ -20,8 +20,9 @@ function init() {
 async function signin(id, pass, otp) {
     const pwph = `${id} ${pass}`;
     session.set(LOGOUT_LISTENERS, []); // reset listeners on sign in
-        
-    const resp = await apiman.rest(APP_CONSTANTS.API_LOGIN, "POST", {pwph, otp, id, bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC)}, false, true);
+    const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
+    const disable_mfa = urlObj.searchParams.get(APP_CONSTANTS.DISABLE_MFA)==="true";
+    const resp = await apiman.rest(APP_CONSTANTS.API_LOGIN, "POST", {pwph, otp, id, bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC),disable_mfa: disable_mfa}, false, true);
     if (!resp) {LOG.warn(`Unknown reason for login failure for ${id}. Null response.`); return loginmanager.ID_INTERNAL_ERROR;}
     if (resp && resp.tokenflag) {   // login successful, JWT has been generated
         session.set(APP_CONSTANTS.USERID, resp.id); 
