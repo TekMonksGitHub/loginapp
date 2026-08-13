@@ -123,8 +123,10 @@ const _informLoginListeners = async result => {
 	const loginlisteners = CLUSTER_MEMORY.get(LOGIN_LISTENERS_MEMORY_KEY, []);
 	for (const listener of loginlisteners) {
 		const listenerFunction = require(listener.modulePath)[listener.functionName];
-		if (!(await listenerFunction(result))) return false; return true; 
+        const listenerFunctionResult = await listenerFunction(result);
+		if (!listenerFunctionResult) return false; 
 	}
+    return true;
 }
 
 const validateRequest = jsonReq => jsonReq && jsonReq.pwph && jsonReq.id && (jsonReq?.dma === true || jsonReq.otp !== undefined);
