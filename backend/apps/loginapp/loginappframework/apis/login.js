@@ -64,8 +64,9 @@ exports.doService = async (jsonReq, servObject) => {
 		LOG.error(`${result.reason == REASONS.BAD_ID?"Bad id":result.reason == REASONS.BAD_PASSWORD?"Bad password":"Unknown reason for login failure"} for login request for ID: ${jsonReq.id}.`);
 	}
 
+	const keysBeforeListeners = Object.keys(result);	// anything a listener adds below is meant for the UI, so it is returned
 	if (result.tokenflag && (!(await _informLoginListeners(result)))) {	// inform login listeners and give them a chance to veto the login
-		tokenflag = false; result.result = false; 
+		result.tokenflag = false; result.result = false;
 		if (result.reason == REASONS.OK || (!result.reason)) result.reason = REASONS.UNKNOWN;	// if the listener didn't add a reason for veto, then make the reason unknown
 	}
 
@@ -73,13 +74,15 @@ exports.doService = async (jsonReq, servObject) => {
 		LOG.info(`User logged in: ${result.id}${APP_CONSTANTS.CONF.verify_email_on_registeration?`, email verification status is ${result.verified}.`:"."}`); 
 		const remoteIP = utils.getClientIP(servObject.req);	// api end closes the socket so when the queue task runs remote IP is lost.
 		queueExecutor.add(async _=>{	// update login stats don't care much if it fails
-			try { await userid.updateLoginStats(jsonReq.id, Date.now(), remoteIP), undefined, true, 
-				APP_CONSTANTS.CONF.login_update_delay||DEFAULT_QUEUE_DELAY } 
+			try { await userid.updateLoginStats(jsonReq.id, Date.now(), remoteIP); }
 			catch(err) {LOG.error(`Error updating login stats for ID ${jsonReq.id}. Error is ${err}.`);}
-		});	
+		}, undefined, true, APP_CONSTANTS.CONF.login_update_delay||DEFAULT_QUEUE_DELAY);
 	} else LOG.error(`Bad login or not approved for ID: ${jsonReq.id}.`);
 
-	return {...result, verified: result.verified==1?true:false};
+	if (!result.tokenflag) return {result: false, reason: result.reason};
+
+	const listenerAdditions = Object.fromEntries(Object.entries(result).filter(([key]) => !keysBeforeListeners.includes(key)));
+	return {result: true, tokenflag: true, id: result.id, name: result.name, org: result.org, role: result.role, totpsec: result.totpsec, verified: result.verified==1?true:false, ...listenerAdditions};
 }
 
 exports.getID = headers => {
