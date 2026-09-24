@@ -155,6 +155,8 @@ div.lgbox > span {
 </style>
 {{{APP_CONSTANTS.CSS_STYLETAG_START}}}
 	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}#4FB4ED;{{/url.bgc}} }
+	span#signin, .advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}#ffffff;{{/url.txtc}} }
+	{{#url.txtc}}img.logo, div#backimage { filter: invert(1); }{{/url.txtc}}
 {{{APP_CONSTANTS.CSS_STYLETAG_END}}}
 
 {{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
@@ -205,7 +207,7 @@ div.lgbox > span {
 	<span><br><br>{{i18n.LoginMsg}}<br><br></span>
 	<login-box routeOnSuccess="{{{routeonsuccess}}}" minlength="{{APP_CONSTANTS.MIN_PASS_LENGTH}}"
 		dataOnSuccessButNotVerified='{"showDialog":{"message": "&#x7B;&#x7B;#needs_verification&#x7D;&#x7D;{{i18n.LoginSuccessNeedsVerification}}&#x7B;&#x7B;/needs_verification&#x7D;&#x7D;&#x7B;&#x7B;^needs_verification&#x7D;&#x7D;{{i18n.RegisterSuccess}}&#x7B;&#x7B;/needs_verification}}"}}'
-		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}"></login-box>
+		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}{{#url.txtc}}{{#url.bgc}}&{{/url.bgc}}{{^url.bgc}}?{{/url.bgc}}txtc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.txtc}}"></login-box>
 </div>
 </div>
 

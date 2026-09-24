@@ -69,6 +69,11 @@ export const APP_CONSTANTS = {
 
     "DEFAULT_BGC": "#4FB4ED",
 
+    SEARCH_PARAM_TXTC: "txtc",
+    SESSION_VARIABLE_TXTC: "txtc",
+
+    "DEFAULT_TXTC": "#ffffff",
+
     USER_ROLE: "user",
     GUEST_ROLE: "guest",
     ADMIN_ROLE: "admin",
