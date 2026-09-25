@@ -11,7 +11,7 @@ import {APP_CONSTANTS as AUTO_APP_CONSTANTS} from "./constants.mjs";
 const apiman = $$.libapimanager;
 
 const init = async hostname => {
-	window.monkshu_env.apps[AUTO_APP_CONSTANTS.APP_NAME] = AUTO_APP_CONSTANTS.ENV;
+	window.monkshu_env.apps[AUTO_APP_CONSTANTS.APP_NAME] = {};
 	const mustache = await $$.librouter.getMustache();
 	window.APP_CONSTANTS = JSON.parse(mustache.render(JSON.stringify(AUTO_APP_CONSTANTS), {hostname}));
 	window.LOG = (await import ("/framework/js/log.mjs")).LOG;

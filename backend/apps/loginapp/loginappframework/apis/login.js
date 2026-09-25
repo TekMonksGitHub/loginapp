@@ -66,17 +66,23 @@ exports.doService = async (jsonReq, servObject) => {
 
 	result.tokenflag = false; 	// default assume login failed no JWT token will be generated
 	if (result.result && result.approved) {	// perform second factor
+		//dma flag is to disable mutifactor authentication
+		if (jsonReq?.dma === true || result.totpsec === APP_CONSTANTS.TOTP_BYPASS_FLAG) { result.result = true; result.tokenflag = true; result.reason = REASONS.OK;
+			LOG.info(`User ${result.id} logged in with MFA bypassed.`);
+		} else {
 		result.result = totp.verifyTOTP(result.totpsec, jsonReq.otp); 
 		if (!result.result) {LOG.error(`Bad OTP given for: ${result.id}.`); result.reason = REASONS.BAD_OTP;}
 		else {result.tokenflag = true; result.reason = REASONS.OK;}	// ID is OK, password is OK, OTP is OK, and user is approved
+		}
 	} else if (result.result && (!result.approved)) {LOG.info(`User not approved, ${result.id}.`); result.reason = REASONS.BAD_APPROVAL;}
 	else {
 		result.reason = result.reason == userid.NO_ID ? REASONS.BAD_ID : result.reason == userid.BAD_PASSWORD ? REASONS.BAD_PASSWORD : REASONS.UNKNOWN;
 		LOG.error(`${result.reason == REASONS.BAD_ID?"Bad id":result.reason == REASONS.BAD_PASSWORD?"Bad password":"Unknown reason for login failure"} for login request for ID: ${jsonReq.id}.`);
 	}
 
+	const keysBeforeListeners = Object.keys(result);	// anything a listener adds below is meant for the UI, so it is returned
 	if (result.tokenflag && (!(await _informLoginListeners(result)))) {	// inform login listeners and give them a chance to veto the login
-		tokenflag = false; result.result = false; 
+		result.tokenflag = false; result.result = false;
 		if (result.reason == REASONS.OK || (!result.reason)) result.reason = REASONS.UNKNOWN;	// if the listener didn't add a reason for veto, then make the reason unknown
 	}
 
@@ -84,13 +90,15 @@ exports.doService = async (jsonReq, servObject) => {
 		LOG.info(`User logged in: ${result.id}${APP_CONSTANTS.CONF.verify_email_on_registeration?`, email verification status is ${result.verified}.`:"."}`); 
 		const remoteIP = utils.getClientIP(servObject.req);	// api end closes the socket so when the queue task runs remote IP is lost.
 		queueExecutor.add(async _=>{	// update login stats don't care much if it fails
-			try { await userid.updateLoginStats(jsonReq.id, Date.now(), remoteIP), undefined, true, 
-				APP_CONSTANTS.CONF.login_update_delay||DEFAULT_QUEUE_DELAY } 
+			try { await userid.updateLoginStats(jsonReq.id, Date.now(), remoteIP); }
 			catch(err) {LOG.error(`Error updating login stats for ID ${jsonReq.id}. Error is ${err}.`);}
-		});	
+		}, undefined, true, APP_CONSTANTS.CONF.login_update_delay||DEFAULT_QUEUE_DELAY);
 	} else LOG.error(`Bad login or not approved for ID: ${jsonReq.id}.`);
 
-	return {...result, verified: result.verified==1?true:false};
+	if (!result.tokenflag) return {result: false, reason: result.reason};
+
+	const listenerAdditions = Object.fromEntries(Object.entries(result).filter(([key]) => !keysBeforeListeners.includes(key)));
+	return {result: true, tokenflag: true, id: result.id, name: result.name, org: result.org,domain: result.domain, role: result.role, totpsec: result.totpsec, verified: result.verified==1?true:false, ...listenerAdditions};
 }
 
 exports.getID = headers => {
@@ -134,8 +142,10 @@ const _informLoginListeners = async result => {
 	const loginlisteners = CLUSTER_MEMORY.get(LOGIN_LISTENERS_MEMORY_KEY, []);
 	for (const listener of loginlisteners) {
 		const listenerFunction = require(listener.modulePath)[listener.functionName];
-		if (!(await listenerFunction(result))) return false; return true; 
+        const listenerFunctionResult = await listenerFunction(result);
+		if (!listenerFunctionResult) return false; 
 	}
+    return true;
 }
 
 async function verifyGoogleToken(jsonReq) {
@@ -249,4 +259,4 @@ async function verifyGoogleToken(jsonReq) {
 	}
 }
 
-const validateRequest = jsonReq => (jsonReq && jsonReq.pwph && jsonReq.otp && jsonReq.id);
+const validateRequest = jsonReq => jsonReq && jsonReq.pwph && jsonReq.id && (jsonReq?.dma === true || jsonReq.otp !== undefined);

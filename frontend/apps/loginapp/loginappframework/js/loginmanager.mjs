@@ -20,8 +20,8 @@ function init() {
 async function signin(id, pass, otp) {
     const pwph = `${id} ${pass}`;
     session.set(LOGOUT_LISTENERS, []); // reset listeners on sign in
-        
-    const resp = await apiman.rest(APP_CONSTANTS.API_LOGIN, "POST", {pwph, otp, id, bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC)}, false, true);
+    const disableMFA = isMfaDisabled();
+    const resp = await apiman.rest(APP_CONSTANTS.API_LOGIN, "POST", {pwph, otp, id, bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC),dma: disableMFA}, false, true);
     if (!resp) {LOG.warn(`Unknown reason for login failure for ${id}. Null response.`); return loginmanager.ID_INTERNAL_ERROR;}
     if (resp && resp.tokenflag) {   // login successful, JWT has been generated
         session.set(APP_CONSTANTS.USERID, resp.id); 
@@ -91,10 +91,12 @@ async function registerOrUpdate(old_id, name=session.get(APP_CONSTANTS.USERNAME)
         pass=session.get("__org_monkshu_cuser_pass"), org=session.get(APP_CONSTANTS.USERORG), 
         totpSecret, totpCode, role=session.get(APP_CONSTANTS.CURRENT_USERROLE), approved) {
     const pwph = `${id} ${pass}`, isUpdate = old_id?true:false;
+    //if mfa is disabled for the session, pass that info to backend
+    const disableMFA = isMfaDisabled();
 
     const req = {old_id, name, id: (isUpdate && session.get(APP_CONSTANTS.USERID))?session.get(APP_CONSTANTS.USERID):id, 
         pwph, org, totpSecret, totpCode, role, approved, lang: i18n.getSessionLang(), new_id: isUpdate?id:undefined, 
-        bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC)}; 
+        bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC), dma: disableMFA}; 
     const resp = await apiman.rest(isUpdate?APP_CONSTANTS.API_UPDATE:APP_CONSTANTS.API_REGISTER, "POST", req, isUpdate?true:false, true);
     if (!resp) {LOG.error(`${isUpdate?"Update":"Registration"} failed for ${id} due to internal error. Null response.`); return loginmanager.ID_INTERNAL_ERROR;}
     else if (!resp.result) {    // registration failed, reasons can be bad OTP, ID exists or some internal error
@@ -175,6 +177,11 @@ function startAutoLogoutTimer() { return;
     const resetTimer = _=> {_stopAutoLogoutTimer(); session.set(TIMEOUT_CURRENT, setTimeout(_=>logout(true), APP_CONSTANTS.TIMEOUT));}
     for (const event of events) {document.addEventListener(event, resetTimer);}
     resetTimer();   // start the timing
+}
+
+function isMfaDisabled() {
+    const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
+    return urlObj.searchParams.get(APP_CONSTANTS.DISABLE_MFA) === "true";
 }
 
 const interceptPageLoadData = _ => {

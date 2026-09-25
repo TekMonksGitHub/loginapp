@@ -12,10 +12,11 @@ const LOGINAPP_PATH = `${APP_PATH}/loginappframework`;
 const CONF_PATH = `${LOGINAPP_PATH}/conf`;
 const COMPONENTS_PATH = `${LOGINAPP_PATH}/components`;
 const API_PATH = `${BACKEND}/apps/${APP_NAME}`;
+const DISABLE_MFA = "dma"; // no second factor
 
 export const APP_CONSTANTS = {
     FRONTEND, BACKEND, APP_PATH, APP_NAME, COMPONENTS_PATH, API_PATH, CONF_PATH, LOGINAPP_PATH, 
-    EMBEDDED_APP_NAME, EMBEDDED_APP_PATH,
+    EMBEDDED_APP_NAME, EMBEDDED_APP_PATH, DISABLE_MFA,
 
     MAIN_HTML: LOGINAPP_PATH+"/main.html",
     REROUTE_HTML: LOGINAPP_PATH+"/reroute.html",
@@ -78,20 +79,20 @@ export const APP_CONSTANTS = {
             LOGINAPP_PATH+"/download.html", LOGINAPP_PATH+"/error.html", LOGINAPP_PATH+"/verify.html", 
             LOGINAPP_PATH+"/main.html", LOGINAPP_PATH+"/reset.html", LOGINAPP_PATH+"/initiallogin.html", 
             LOGINAPP_PATH+"/register.html", LOGINAPP_PATH+"/notapproved.html", 
-            LOGINAPP_PATH+"/loginroom.html", LOGINAPP_PATH+"/login.html", $$.MONKSHU_CONSTANTS.ERROR_HTML,
-            `${EMBEDDED_APP_PATH}/*.html`],
+            LOGINAPP_PATH+"/loginroom.html", LOGINAPP_PATH+"/login.html",  LOGINAPP_PATH+"/reroute.html", $$.MONKSHU_CONSTANTS.ERROR_HTML,
+            `${EMBEDDED_APP_PATH}/[^/]+\\.html`, `${EMBEDDED_APP_PATH}/pages/[^/]+\\.html`, `${EMBEDDED_APP_PATH}/dialogs/[^/]+\\.html`],
 
         admin:[window.location.origin, LOGINAPP_PATH+"/index.html", LOGINAPP_PATH+"/download.html", 
             LOGINAPP_PATH+"/error.html", LOGINAPP_PATH+"/verify.html", LOGINAPP_PATH+"/main.html", 
             LOGINAPP_PATH+"/reset.html", LOGINAPP_PATH+"/initiallogin.html", LOGINAPP_PATH+"/register.html", 
-            LOGINAPP_PATH+"/notapproved.html", LOGINAPP_PATH+"/loginroom.html", LOGINAPP_PATH+"/login.html", 
+            LOGINAPP_PATH+"/notapproved.html", LOGINAPP_PATH+"/loginroom.html", LOGINAPP_PATH+"/login.html", LOGINAPP_PATH+"/reroute.html", 
             LOGINAPP_PATH+"/manage.html", $$.MONKSHU_CONSTANTS.ERROR_HTML, 
-            `${EMBEDDED_APP_PATH}/*.html`],
+            `${EMBEDDED_APP_PATH}/[^/]+\\.html`, `${EMBEDDED_APP_PATH}/pages/[^/]+\\.html`, `${EMBEDDED_APP_PATH}/dialogs/[^/]+\\.html`],
 
         guest:[window.location.origin, LOGINAPP_PATH+"/index.html", LOGINAPP_PATH+"/download.html", 
             LOGINAPP_PATH+"/error.html", LOGINAPP_PATH+"/verify.html", LOGINAPP_PATH+"/reset.html", 
             LOGINAPP_PATH+"/initiallogin.html", LOGINAPP_PATH+"/register.html", 
-            LOGINAPP_PATH+"/notapproved.html", LOGINAPP_PATH+"/login.html", LOGINAPP_PATH+"/loginroom.html", 
+            LOGINAPP_PATH+"/notapproved.html", LOGINAPP_PATH+"/login.html", LOGINAPP_PATH+"/loginroom.html", LOGINAPP_PATH+"/reroute.html",
             $$.MONKSHU_CONSTANTS.ERROR_HTML]
     },
 

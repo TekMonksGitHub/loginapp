@@ -35,9 +35,12 @@ async function elementConnected(host) {
 	if (host.getAttribute("styleBody")) data.styleBody = `<style>${host.getAttribute("styleBody")}</style>`;
 
 	const memory = register_box.getMemory(host.id), type = host.getAttribute("type");
-	memory.totpKey = _getTOTPRandomKey(); memory.type = type;
-	data.totpQRCodeData = await _getTOTPQRCode(memory.totpKey); 
-	data.totpURL = await _getTOTPURL(memory.totpKey);
+	// Check if mfa should be disabled
+	const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
+    const hide_otp = urlObj.searchParams.get(APP_CONSTANTS.DISABLE_MFA) === 'true'; memory.totpKey = _getTOTPRandomKey(); memory.type = type; memory.hide_otp = hide_otp;
+	if (!hide_otp) { data.totpQRCodeData = await _getTOTPQRCode(memory.totpKey); data.totpURL = await _getTOTPURL(memory.totpKey); }
+
+    data.hide_otp = hide_otp;
 	data.AuthenticatorMsg = await i18n.get(type == "reset"?"ResetAuthenticatorMsg":"DownloadAuthenticatorMsg");
 	data.Password = await i18n.get(type == "reset"?"NewPassword":"Password");
 	data.PasswordAgain = await i18n.get(type == "reset"?"NewPasswordAgain":"PasswordAgain");
@@ -74,12 +77,12 @@ async function registerOrUpdate(element) {
 	const id_old = register_box.getHostElement(element).getAttribute("email") ? shadowRoot.querySelector("input#oldid").value.toLowerCase() : undefined;
 	const passSelector = shadowRoot.querySelector("password-box#pass1"); const pass = passSelector.value;
 	const orgSelector = shadowRoot.querySelector("input#org"); const org = orgSelector.value;
-	const totpCodeSelector = shadowRoot.querySelector("input#otp"); const totpCode = totpCodeSelector.value && totpCodeSelector.value != ""?totpCodeSelector.value:null;
+    const totpCodeSelector = shadowRoot.querySelector("input#otp"); const totpCode = (totpCodeSelector && totpCodeSelector.value && totpCodeSelector.value != "") ? totpCodeSelector.value : null;
 	const routeOnSuccess = register_box.getHostElement(element).getAttribute("routeOnSuccess");
 	const routeOnNotApproved = register_box.getHostElement(element).getAttribute("routeOnNotApproved");
 
 	_showWait(shadowRoot);
-	const registerResult = await loginmanager.registerOrUpdate(id_old, name, id, pass, org, totpCode?memory.totpKey:null, totpCode);
+	const registerResult = await loginmanager.registerOrUpdate(id_old, name, id, pass, org, (totpCode && !memory.hide_otp) ? memory.totpKey : null, totpCode);
 	_hideWait(shadowRoot);
 
 	const dataOnSuccess = JSON.parse(await router.expandPageData(register_box.getHostElement(element).getAttribute("dataOnSuccess")||"{}",
@@ -125,7 +128,7 @@ function _validateForm(shadowRoot) {
 	if (!pass1.checkValidity()) {pass1.reportValidity(); return false;}
 	if (!pass2.checkValidity()) {pass2.reportValidity(); return false;}
 	if (!org.checkValidity()) {org.reportValidity(); return false;}
-	if (!otp.checkValidity()) {otp.reportValidity(); return false;}
+	if (otp && !otp.checkValidity()) {otp.reportValidity(); return false;}
 	if (!_doPasswordsMatch(shadowRoot)) {shadowRoot.querySelector("span#errorPasswordMismatch").classList.add("errorvisible"); return false;}
 
 	return true;

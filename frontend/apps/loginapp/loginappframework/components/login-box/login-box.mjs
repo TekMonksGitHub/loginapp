@@ -16,7 +16,9 @@ async function elementConnected(host) {
 
 	if (host.getAttribute("styleBody")) data.styleBody = `<style>${host.getAttribute("styleBody")}</style>`;
 	data.minlength = host.getAttribute("minlength"); data.COMPONENT_PATH = COMPONENT_PATH;
-
+	// Check if disable multi-factor authentication (dma) parameter is true in URL
+	const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
+	data.hide_otp = urlObj.searchParams.get(APP_CONSTANTS.DISABLE_MFA) === 'true';
 	login_box.setData(host.id, data);
 }
 
@@ -26,7 +28,7 @@ async function signin(signInButton) {
 
 	const userid = shadowRoot.querySelector("#userid").value.toLowerCase();
 	const pass = shadowRoot.querySelector("#pass").value;
-	const otp = shadowRoot.querySelector("#otp").value;
+	const otpElement = shadowRoot.querySelector("#otp"); const otp = otpElement ? otpElement.value : '';
 	const routeOnSuccess = login_box.getHostElement(signInButton).getAttribute("routeOnSuccess");
 	const routeOnNotApproved = login_box.getHostElement(signInButton).getAttribute("routeOnNotApproved");
 
@@ -47,7 +49,7 @@ function _validateForm(shadowRoot) {
 	const userid = shadowRoot.querySelector("input#userid"), pass = shadowRoot.querySelector("#pass"), otp = shadowRoot.querySelector("#otp");
 	if (!userid.checkValidity()) {userid.reportValidity(); return false;}
 	if (!pass.checkValidity()) {pass.reportValidity(); return false;}
-	if (!otp.checkValidity()) {otp.reportValidity(); return false;}
+	if (otp && !otp.checkValidity()) {otp.reportValidity(); return false;}
 	return true;
 }
 

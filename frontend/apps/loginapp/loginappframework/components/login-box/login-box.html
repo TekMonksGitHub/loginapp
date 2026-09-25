@@ -110,10 +110,8 @@ img#spinner {height: 2em; width: 2em;}
     oninvalid="this.setCustomValidity('{{i18n.FillField}}')" oninput="setCustomValidity('')"
     required>
 <password-box style="width:90%; padding-top: 20px;" id="pass" placeholder="{{i18n.Password}}" 
-    required="true" minlength="{{minlength}}" customValidity="{{i18n.FillField}}" styleBody="span#container{width: 90%; padding-top: 1.5em;}"></password-box>
-<input type="text" id="otp" placeholder="{{i18n.Otp}}" 
-    oninvalid="this.setCustomValidity('{{i18n.FillField}}')" oninput="setCustomValidity('')"
-    required
-    onkeyup="if (event.keyCode == 13) monkshu_env.components['login-box'].getShadowRootByContainedElement(this).querySelector('#submit').click();">
+    required="true" minlength="{{minlength}}" customValidity="{{i18n.FillField}}" styleBody="span#container{width: 90%; padding-top: 1.5em;}"
+    {{#hide_otp}}onkeyup="if (event.keyCode == 13) monkshu_env.components['login-box'].getShadowRootByContainedElement(this).querySelector('#submit').click();"{{/hide_otp}}></password-box>
+{{^hide_otp}} <input type="text" id="otp" placeholder="{{i18n.Otp}}" oninvalid="this.setCustomValidity('{{i18n.FillField}}')" oninput="setCustomValidity('')"required onkeyup="if (event.keyCode == 13) monkshu_env.components['login-box'].getShadowRootByContainedElement(this).querySelector('#submit').click();"> {{/hide_otp}}
 <button type="submit" id="submit" onclick="monkshu_env.components['login-box'].signin(this);">{{i18n.SignIn}}</button>
 </div>
