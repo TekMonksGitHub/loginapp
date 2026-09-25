@@ -146,7 +146,8 @@ span.error {color: #FF716D;}
 span.link:hover {text-decoration: underline;}
 </style>
 {{{APP_CONSTANTS.CSS_STYLETAG_START}}}
-	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}#4FB4ED;{{/url.bgc}} }
+	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{APP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
+	.advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{APP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
 {{{APP_CONSTANTS.CSS_STYLETAG_END}}}
 
 {{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}

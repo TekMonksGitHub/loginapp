@@ -133,7 +133,8 @@ div.lgbox > span {
 }
 </style>
 {{{APP_CONSTANTS.CSS_STYLETAG_START}}}
-	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}#4FB4ED;{{/url.bgc}} }
+	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{APP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
+	.advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{APP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
 {{{APP_CONSTANTS.CSS_STYLETAG_END}}}
 
 {{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
@@ -180,7 +181,7 @@ div.lgbox > span {
 	<register-box id="reset" roles='["{{APP_CONSTANTS.GUEST_ROLE}}", "{{APP_CONSTANTS.USER_ROLE}}"]' type="reset" 
 		email="{{url.e}}" time="{{url.t}}" minlength="{{APP_CONSTANTS.MIN_PASS_LENGTH}}" routeOnSuccess="./main.html" 
 		dataOnSuccess='{"showDialog":{"message": "{{i18n.ResetSuccess}}"}}' 
-		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}"
+		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}{{#url.txtc}}{{#url.bgc}}&{{/url.bgc}}{{^url.bgc}}?{{/url.bgc}}txtc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.txtc}}"
 		mobileQueries='{"start": "{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}", "end": "{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}"}'></register-box>
 </div>
 </div>
