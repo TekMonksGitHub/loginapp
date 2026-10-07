@@ -17,7 +17,7 @@ exports.doService = async jsonReq => {
 	if (!validateRequest(jsonReq)) {LOG.error("Validation failure."); return CONSTANTS.FALSE_RESULT;}
 
     const jwtTokenManager = APIREGISTRY.getExtension("jwtTokenManager");
-	const result = jwtTokenManager.checkToken(jsonReq.jwt);
+	const result = await jwtTokenManager.checkToken(jsonReq.jwt);
 
     if (result && (!jsonReq.noonce)) jwtTokenManager.releaseToken(jsonReq.jwt); // release token once checked
     
