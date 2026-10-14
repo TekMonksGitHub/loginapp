@@ -2,7 +2,7 @@
  * Validates TOTP for an ID given totpsec. 
  * (C) 2020 TekMonks. All rights reserved.
  */
-const totp = require(`${APP_CONSTANTS.LIB_DIR}/totp.js`);
+const totp = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/totp.js`);
 
 exports.doService = async jsonReq => {
 	if (!validateRequest(jsonReq)) {LOG.error("Validation failure."); return CONSTANTS.FALSE_RESULT;}

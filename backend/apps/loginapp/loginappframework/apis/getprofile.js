@@ -5,7 +5,7 @@
  * (C) 2015 TekMonks. All rights reserved.
  */
 const crypt = require(`${CONSTANTS.LIBDIR}/crypt.js`);
-const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
+const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
 const EMAIL_RE = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
 
 exports.doService = async jsonReq => {
@@ -16,7 +16,7 @@ exports.doService = async jsonReq => {
 		return CONSTANTS.FALSE_RESULT;
 	}
 
-	if (Date.now() - time > APP_CONSTANTS.CONF.reset_expiry_time) {LOG.error(`Reset link timed out for email: ${id}`); return CONSTANTS.FALSE_RESULT;}
+	if (Date.now() - time > LOGINAPP_CONSTANTS.CONF.reset_expiry_time) {LOG.error(`Reset link timed out for email: ${id}`); return CONSTANTS.FALSE_RESULT;}
     if (!id.match(EMAIL_RE)) {LOG.error(`Validation failure due to bad email: ${id}.`); return CONSTANTS.FALSE_RESULT;}
 
 	LOG.info("Got getProfile request for ID: " + id);

@@ -81,7 +81,7 @@ span.button {
 }
 span#update {margin-top: 2em;}
 </style>
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_PORTRAIT_START}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_PORTRAIT_START}}}
     div#profile {
         flex-flow: column;
         align-items: center;
@@ -103,9 +103,9 @@ span#update {margin-top: 2em;}
         width: 100%;
         flex-grow: 0;
     }
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_PORTRAIT_END}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_PORTRAIT_END}}}
 
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_LANDSCAPE_START}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_LANDSCAPE_START}}}
 div#profile {
     margin-bottom: 1em;
     margin-top: 1em;
@@ -117,10 +117,10 @@ div#profile {
     width: calc(100% - 2em);
     margin: 1em 0em 1em 1em;
 }
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_LANDSCAPE_END}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_LANDSCAPE_END}}}
 
 <script type="module">
-import {loginappframework} from "./js/loginappframework.mjs"; monkshu_env.apps[APP_CONSTANTS.APP_NAME].loginappframework = loginappframework; 
+import {loginappframework} from "./js/loginappframework.mjs"; monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].loginappframework = loginappframework; 
 </script>
 
 <div id="profile">
@@ -137,15 +137,15 @@ import {loginappframework} from "./js/loginappframework.mjs"; monkshu_env.apps[A
 <input type="hidden" id="oldid" value="{{id}}">
 <input type="text" id="org" placeholder="{{i18n.Org}}" value="{{org}}" readonly 
     oninvalid="this.setCustomValidity('{{i18n.FillField}}')" oninput="setCustomValidity('')">
-<password-box id="pass1" placeholder="{{i18n.Password}}" required="true" minlength="{{APP_CONSTANTS.MIN_PASS_LENGTH}}" 
+<password-box id="pass1" placeholder="{{i18n.Password}}" required="true" minlength="{{LOGINAPP_CONSTANTS.MIN_PASS_LENGTH}}" 
     customValidity="{{i18n.FillField}}"></password-box>
-<password-box id="pass2" placeholder="{{i18n.PasswordAgain}}" required="true" minlength="{{APP_CONSTANTS.MIN_PASS_LENGTH}}" 
+<password-box id="pass2" placeholder="{{i18n.PasswordAgain}}" required="true" minlength="{{LOGINAPP_CONSTANTS.MIN_PASS_LENGTH}}" 
     customValidity="{{i18n.FillField}}"></password-box>
 <div id="otp_help_and_input">
     <img id="totpqr" src="{{totpQRCodeData}}">
     <span id="totpmsg">{{i18n.ChangeAuthenticatorMessage}}</span>
 </div>
-<span id="update" class="button" onclick='monkshu_env.apps[APP_CONSTANTS.APP_NAME].loginappframework.updateprofile()'>Update</span>
+<span id="update" class="button" onclick='monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].loginappframework.updateprofile()'>Update</span>
 </span>
 
 </div>

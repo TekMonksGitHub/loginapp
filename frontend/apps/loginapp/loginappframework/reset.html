@@ -132,17 +132,17 @@ div.lgbox > span {
 	font-size: x-small;
 }
 </style>
-{{{APP_CONSTANTS.CSS_STYLETAG_START}}}
-	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{APP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
-	.advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{APP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
-{{{APP_CONSTANTS.CSS_STYLETAG_END}}}
+{{{LOGINAPP_CONSTANTS.CSS_STYLETAG_START}}}
+	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{LOGINAPP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
+	.advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{LOGINAPP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
+{{{LOGINAPP_CONSTANTS.CSS_STYLETAG_END}}}
 
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
 	div#maincontent {flex-direction: column;}
 	div#header {justify-content: space-around; height: 6em;}
 	.lgbox {padding: 1em; box-shadow: none;}
 	div#backimage {background-position: center 1em;}
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
 
 <!doctype html>
 <html>
@@ -165,7 +165,7 @@ div.lgbox > span {
 <div id="bodydiv">
 <div id="header">
 <span id="imgheader">
-	<img class="logo" src="./img/logo.svg" onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')"></img>
+	<img class="logo" src="./img/logo.svg" onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')"></img>
 </span>
 </div>
 
@@ -173,16 +173,16 @@ div.lgbox > span {
 <div class="advtextbox">
 	<h1>{{i18n.logintagline}}</h1>
 	<h2>{{i18n.loginsubtag}}</h2>
-	<p onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')">{{i18n.learn}}</p>
+	<p onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')">{{i18n.learn}}</p>
 </div>
 
 <div class="lgbox">
 	<span><br><br>{{i18n.ResetMsg}}<br><br></span>
-	<register-box id="reset" roles='["{{APP_CONSTANTS.GUEST_ROLE}}", "{{APP_CONSTANTS.USER_ROLE}}"]' type="reset" 
-		email="{{url.e}}" time="{{url.t}}" minlength="{{APP_CONSTANTS.MIN_PASS_LENGTH}}" routeOnSuccess="./main.html" 
+	<register-box id="reset" roles='["{{LOGINAPP_CONSTANTS.GUEST_ROLE}}", "{{LOGINAPP_CONSTANTS.USER_ROLE}}"]' type="reset" 
+		email="{{url.e}}" time="{{url.t}}" minlength="{{LOGINAPP_CONSTANTS.MIN_PASS_LENGTH}}" routeOnSuccess="./main.html" 
 		dataOnSuccess='{"showDialog":{"message": "{{i18n.ResetSuccess}}"}}' 
 		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}{{#url.txtc}}{{#url.bgc}}&{{/url.bgc}}{{^url.bgc}}?{{/url.bgc}}txtc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.txtc}}"
-		mobileQueries='{"start": "{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}", "end": "{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}"}'></register-box>
+		mobileQueries='{"start": "{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}", "end": "{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}"}'></register-box>
 </div>
 </div>
 

@@ -152,19 +152,19 @@ div.registerbox > span {
 	font-size: x-small;
 }
 </style>
-{{{APP_CONSTANTS.CSS_STYLETAG_START}}}
-	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{APP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
-	span#signin, .advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{APP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
+{{{LOGINAPP_CONSTANTS.CSS_STYLETAG_START}}}
+	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{LOGINAPP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
+	span#signin, .advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{LOGINAPP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
 	{{#url.txtc}}img.logo, div#backimage { filter: invert(1); }{{/url.txtc}}
-{{{APP_CONSTANTS.CSS_STYLETAG_END}}}
+{{{LOGINAPP_CONSTANTS.CSS_STYLETAG_END}}}
 
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
 	div#maincontent {flex-direction: column;}
 	div#header {flex-direction: column-reverse; height: 6em;}
 	span#signin {text-align: center;}
 	.registerbox {padding: 1em; box-shadow: none;}
 	div#backimage {background-position: center 1em;}
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
 
 <!doctype html>
 <html>
@@ -186,7 +186,7 @@ div.registerbox > span {
 <div id="bodydiv">
 <div id="header">
 <span id="imgheader">
-	<img class="logo" src="./img/logo.svg" onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')"></img>
+	<img class="logo" src="./img/logo.svg" onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')"></img>
 </span>
 <span id="signin">
 	<span><a href="{{#_org_monkshu_makeLink}}./register.html{{{url.url_search}}}{{/_org_monkshu_makeLink}}">{{i18n.Register}}</a></span>
@@ -198,22 +198,22 @@ div.registerbox > span {
 <div class="advtextbox">
 	<h1>{{i18n.logintagline}}</h1>
 	<h2>{{i18n.loginsubtag}}</h2>
-	<p onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')">{{i18n.learn}}</p>
+	<p onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')">{{i18n.learn}}</p>
 </div>
 
 <div class="registerbox">
 	<span><br><br>{{i18n.RegisterMsg}}<br><br></span>
 	<register-box id="register" 
-		routeOnSuccess="{{{routeonsuccess}}}" type="register" minlength="{{APP_CONSTANTS.MIN_PASS_LENGTH}}"
+		routeOnSuccess="{{{routeonsuccess}}}" type="register" minlength="{{LOGINAPP_CONSTANTS.MIN_PASS_LENGTH}}"
 		dataOnSuccess='{"showDialog":{"message": "&#x7B;&#x7B;#needs_verification&#x7D;&#x7D;{{i18n.RegisterSuccessNeedsVerification}}&#x7B;&#x7B;/needs_verification&#x7D;&#x7D;&#x7B;&#x7B;^needs_verification&#x7D;&#x7D;{{i18n.RegisterSuccess}}&#x7B;&#x7B;/needs_verification}}"}}' 
 		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}{{#url.txtc}}{{#url.bgc}}&{{/url.bgc}}{{^url.bgc}}?{{/url.bgc}}txtc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.txtc}}" 
-		mobileQueries='{"start": "{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}", "end": "{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}"}',
-		apiPath='{{APP_CONSTANTS.BACKEND}}/apps/{{APP_CONSTANTS.APP_NAME}}'></register-box>
+		mobileQueries='{"start": "{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}", "end": "{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}"}',
+		apiPath='{{LOGINAPP_CONSTANTS.BACKEND}}/apps/{{LOGINAPP_CONSTANTS.APP_NAME}}'></register-box>
 		<google-sso-box 
 			routeOnSuccess="{{{routeonsuccess}}}"
 			routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}">
 			<div id="g_id_onload"
-			data-client_id="{{APP_CONSTANTS.GOOGLE_CLIENT_ID}}"
+			data-client_id="{{LOGINAPP_CONSTANTS.GOOGLE_CLIENT_ID}}"
 			data-callback="onGoogleSignIn">
 			</div>
 			<div style="width: 100%; display: flex; justify-content: center; margin-top: 1.5em;">

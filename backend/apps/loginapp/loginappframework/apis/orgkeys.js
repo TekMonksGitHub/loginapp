@@ -10,7 +10,7 @@
  * (C) 2023 TekMonks. All rights reserved.
  */
 
-const loginapi = require(`${APP_CONSTANTS.API_DIR}/login.js`);
+const loginapi = require(`${LOGINAPP_CONSTANTS.API_DIR}/login.js`);
 
 exports.doService = async jsonReq => {
     if (!validateRequest(jsonReq)) {LOG.error("Validation failure."); return CONSTANTS.FALSE_RESULT;}

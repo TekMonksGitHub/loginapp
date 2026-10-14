@@ -115,13 +115,13 @@ span#mobilefooter > img {
 }
 
 </style>
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
     div#maincontent {padding: 0 1em; height: calc(100% - 4em); position: inherit; top: 0;}
 	img#textlogo {display: none;}
 	span#middleheader {display: none;}
 	img#logout {display: none;}
 	span#mobilefooter {display: flex;}
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
 
 <!doctype html>
 <html>
@@ -135,8 +135,8 @@ span#mobilefooter > img {
 	import {user_manager} from "./components/user-manager/user-manager.mjs";
 	import "./components/span-with-menu/span-with-menu.mjs";
 	import "./components/dialog-box/dialog-box.mjs";
-	import {main} from "./js/main.mjs"; monkshu_env.apps[APP_CONSTANTS.APP_NAME].main = main; 
-	import {loginmanager} from "./js/loginmanager.mjs"; monkshu_env.apps[APP_CONSTANTS.APP_NAME].loginmanager = loginmanager;
+	import {main} from "./js/main.mjs"; monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].main = main; 
+	import {loginmanager} from "./js/loginmanager.mjs"; monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].loginmanager = loginmanager;
 	</script>
 		
 	<title>{{i18n.Title}}</title>
@@ -144,26 +144,26 @@ span#mobilefooter > img {
 
 <body style="margin: 0%">
 <span id="header">
-<img id="textlogo" src="./img/logomainpage.svg" onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')">
-<span id="middleheader"><span id="title">{{i18n.ManageUsersAndOrg}}</span><span id="close" onclick="monkshu_env.frameworklibs.router.navigate(APP_CONSTANTS.MAIN_HTML)">X</span></span>
-<img id="logout" src="./img/poweroff.svg" onclick="monkshu_env.apps[APP_CONSTANTS.APP_NAME].loginmanager.logout()">
+<img id="textlogo" src="./img/logomainpage.svg" onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')">
+<span id="middleheader"><span id="title">{{i18n.ManageUsersAndOrg}}</span><span id="close" onclick="monkshu_env.frameworklibs.router.navigate(LOGINAPP_CONSTANTS.MAIN_HTML)">X</span></span>
+<img id="logout" src="./img/poweroff.svg" onclick="monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].loginmanager.logout()">
 </span>
 
 <div id="maincontent">
-	<user-manager backendurl="{{APP_CONSTANTS.BACKEND}}/apps/{{APP_CONSTANTS.APP_NAME}}" 
-		logoutcommand="monkshu_env.apps[APP_CONSTANTS.APP_NAME].loginmanager.logout()"></user-manager>
+	<user-manager backendurl="{{LOGINAPP_CONSTANTS.BACKEND}}/apps/{{LOGINAPP_CONSTANTS.APP_NAME}}" 
+		logoutcommand="monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].loginmanager.logout()"></user-manager>
 </div>
 
 <span id="mobilefooter">
-	<img src="./img/mobilefooter_home.svg" onclick="monkshu_env.frameworklibs.router.navigate(APP_CONSTANTS.MAIN_HTML)">
+	<img src="./img/mobilefooter_home.svg" onclick="monkshu_env.frameworklibs.router.navigate(LOGINAPP_CONSTANTS.MAIN_HTML)">
 	<img src="./img/mobilefooter_reload.svg" onclick="location.reload()">
 	<span-with-menu id="gearmobile" bottommenu="true" styleBody="url(./pages/menu.stylebody.css)"><img src="./img/mobilefooter_settings.svg">
-		<menu-item onclick="monkshu_env.apps[APP_CONSTANTS.APP_NAME].main.changePassword(this)" label="{{i18n.ChangePassword}}"></menu-item>
-		<menu-item onclick="monkshu_env.apps[APP_CONSTANTS.APP_NAME].main.showOTPQRCode(this)" label="{{i18n.ChangePhone}}"></menu-item>
-		<menu-item onclick="monkshu_env.apps[APP_CONSTANTS.APP_NAME].main.changeProfile(this)" label="{{i18n.ChangeProfile}}"></menu-item>
-		{{#admin}}<menu-item onclick="monkshu_env.frameworklibs.router.navigate(APP_CONSTANTS.MANAGE_HTML)" label="{{i18n.ManageUsersAndOrg}}"></menu-item>{{/admin}}
+		<menu-item onclick="monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].main.changePassword(this)" label="{{i18n.ChangePassword}}"></menu-item>
+		<menu-item onclick="monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].main.showOTPQRCode(this)" label="{{i18n.ChangePhone}}"></menu-item>
+		<menu-item onclick="monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].main.changeProfile(this)" label="{{i18n.ChangeProfile}}"></menu-item>
+		{{#admin}}<menu-item onclick="monkshu_env.frameworklibs.router.navigate(LOGINAPP_CONSTANTS.MANAGE_HTML)" label="{{i18n.ManageUsersAndOrg}}"></menu-item>{{/admin}}
 	</span-with-menu>
-	<img src="./img/mobilefooter_logout.svg" onclick="monkshu_env.apps[APP_CONSTANTS.APP_NAME].main.logoutClicked()">
+	<img src="./img/mobilefooter_logout.svg" onclick="monkshu_env.apps[LOGINAPP_CONSTANTS.APP_NAME].main.logoutClicked()">
 </span>
 
 <dialog-box id="dialog"></dialog-box>

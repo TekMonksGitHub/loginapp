@@ -3,8 +3,8 @@
  * (C) 2022 TekMonks. All rights reserved.
  */
 
-const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
-const register = require(`${APP_CONSTANTS.API_DIR}/register.js`);
+const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
+const register = require(`${LOGINAPP_CONSTANTS.API_DIR}/register.js`);
 
 exports.doService = async jsonReq => {
 	if (!validateRequest(jsonReq)) {LOG.error("Validation failure."); return CONSTANTS.FALSE_RESULT;}
@@ -23,7 +23,7 @@ exports.doService = async jsonReq => {
 	if (result.result) {	// update done successfully
 		LOG.info(`Org added or updated ${result.org}.`); 
 		return {...CONSTANTS.TRUE_RESULT, ...result, id: jsonReq.id, org: jsonReq.new_org||jsonReq.org, 
-			role: APP_CONSTANTS.ROLES.ADMIN};	// as this call regens the JWT token due to org name change
+			role: LOGINAPP_CONSTANTS.ROLES.ADMIN};	// as this call regens the JWT token due to org name change
 	}
 	else {	// DB or internal error
 		LOG.error(`Unable to add or update org ${jsonReq.org} DB error.`);

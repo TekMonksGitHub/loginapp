@@ -42,8 +42,8 @@ import {loginmanager} from "./loginmanager.mjs";
 import {apimanager as apiman} from "/framework/js/apimanager.mjs";
 
 async function doroute(reroutelink_id, visible_class) {
-    const urlParams = new URL(router.getCurrentURL()).searchParams, appname = urlParams.get(APP_CONSTANTS.SEARCH_PARAM_APPNAME), 
-        onetimekey = urlParams.get(APP_CONSTANTS.SEARCH_PARAM_ONETIMEKEY), redirect = urlParams.get(APP_CONSTANTS.SEARCH_PARAM_REDIRECT);
+    const urlParams = new URL(router.getCurrentURL()).searchParams, appname = urlParams.get(LOGINAPP_CONSTANTS.SEARCH_PARAM_APPNAME), 
+        onetimekey = urlParams.get(LOGINAPP_CONSTANTS.SEARCH_PARAM_ONETIMEKEY), redirect = urlParams.get(LOGINAPP_CONSTANTS.SEARCH_PARAM_REDIRECT);
 
     const _doErrorLogout = msg => {LOG.error(msg); loginmanager.logout(); }
 
@@ -51,13 +51,13 @@ async function doroute(reroutelink_id, visible_class) {
     if ((!appname) || (!onetimekey) || (!redirect) || (!redirectURLValid)) {
         _doErrorLogout("Bad login request from the requesting application."); return;}
 
-    const jwtTransferResult = await apiman.rest(APP_CONSTANTS.API_GETTRANSFERJWT, "GET", {appname, onetimekey}, true, false); 
+    const jwtTransferResult = await apiman.rest(LOGINAPP_CONSTANTS.API_GETTRANSFERJWT, "GET", {appname, onetimekey}, true, false); 
     if (!jwtTransferResult || !jwtTransferResult.result) {_doErrorLogout("JWT transfer token call failed, unified login not possible."); return;}
 
     const sendToURL = new URL(redirect), hrefElement = document.querySelector(reroutelink_id);
     sendToURL.searchParams.set("jwt", jwtTransferResult.jwt); const sendtolocation = sendToURL.href;
     hrefElement.href = sendtolocation; if (visible_class) hrefElement.classList.add(visible_class); 
-    setTimeout(_=>window.location.replace(sendtolocation), APP_CONSTANTS.REDIRECT_AFTERLOGIN_TIMEOUT||5000);
+    setTimeout(_=>window.location.replace(sendtolocation), LOGINAPP_CONSTANTS.REDIRECT_AFTERLOGIN_TIMEOUT||5000);
 }
 
 export const reroute = {doroute};

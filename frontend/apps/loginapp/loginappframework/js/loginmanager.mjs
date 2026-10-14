@@ -13,24 +13,24 @@ const LOGOUT_LISTENERS = "__loginmanager_logout_listeners", TIMEOUT_CURRENT = "_
 
 function init() {
     const currenturl = new URL(router.getCurrentURL()), 
-        backgroundColorActive = currenturl.searchParams.get(APP_CONSTANTS.SEARCH_PARAM_BGC) || APP_CONSTANTS.DEFAULT_BGC;
-    session.set(APP_CONSTANTS.SESSION_VARIABLE_BGC, backgroundColorActive);
+        backgroundColorActive = currenturl.searchParams.get(LOGINAPP_CONSTANTS.SEARCH_PARAM_BGC) || LOGINAPP_CONSTANTS.DEFAULT_BGC;
+    session.set(LOGINAPP_CONSTANTS.SESSION_VARIABLE_BGC, backgroundColorActive);
 }
 
 async function signin(id, pass, otp) {
     const pwph = `${id} ${pass}`;
     session.set(LOGOUT_LISTENERS, []); // reset listeners on sign in
     const disableMFA = isMfaDisabled();
-    const resp = await apiman.rest(APP_CONSTANTS.API_LOGIN, "POST", {pwph, otp, id, bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC),dma: disableMFA}, false, true);
+    const resp = await apiman.rest(LOGINAPP_CONSTANTS.API_LOGIN, "POST", {pwph, otp, id, bgc: session.get(LOGINAPP_CONSTANTS.SESSION_VARIABLE_BGC),dma: disableMFA}, false, true);
     if (!resp) {LOG.warn(`Unknown reason for login failure for ${id}. Null response.`); return loginmanager.ID_INTERNAL_ERROR;}
     if (resp && resp.tokenflag) {   // login successful, JWT has been generated
-        session.set(APP_CONSTANTS.USERID, resp.id); 
-        session.set(APP_CONSTANTS.USERNAME, resp.name);
-        session.set(APP_CONSTANTS.USERORG, resp.org);
-        session.set(APP_CONSTANTS.CURRENT_USERROLE, resp.role); 
-        session.set(APP_CONSTANTS.USER_NEEDS_VERIFICATION, resp.verified);
-        session.set(APP_CONSTANTS.USERORGDOMAIN, resp.domain);
-        session.set(APP_CONSTANTS.LOGIN_RESPONSE, resp);
+        session.set(LOGINAPP_CONSTANTS.USERID, resp.id); 
+        session.set(LOGINAPP_CONSTANTS.USERNAME, resp.name);
+        session.set(LOGINAPP_CONSTANTS.USERORG, resp.org);
+        session.set(LOGINAPP_CONSTANTS.CURRENT_USERROLE, resp.role); 
+        session.set(LOGINAPP_CONSTANTS.USER_NEEDS_VERIFICATION, resp.verified);
+        session.set(LOGINAPP_CONSTANTS.USERORGDOMAIN, resp.domain);
+        session.set(LOGINAPP_CONSTANTS.LOGIN_RESPONSE, resp);
         session.set("__org_monkshu_cuser_pass", pass);
         securityguard.setCurrentRole(resp.role);
         LOG.info(`Login succeeded for ${id}.`);
@@ -56,10 +56,10 @@ async function signinWithGoogle(googleUser) {
         const id_token = googleUser.getAuthResponse().id_token;
 
         
-        const bgc = session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC);
+        const bgc = session.get(LOGINAPP_CONSTANTS.SESSION_VARIABLE_BGC);
         const payload = { id_token, bgc };
         
-        const resp = await apiman.rest(APP_CONSTANTS.API_LOGIN, "POST", payload, false, true);
+        const resp = await apiman.rest(LOGINAPP_CONSTANTS.API_LOGIN, "POST", payload, false, true);
         
         if (!resp) {
             LOG.warn(`Google login failed. Null response.`);
@@ -69,13 +69,13 @@ async function signinWithGoogle(googleUser) {
         
         if (resp.success) {
             LOG.info(`Google login succeeded for ${resp.id}`);
-            session.set(APP_CONSTANTS.USERID, resp.id); 
-            session.set(APP_CONSTANTS.USERNAME, resp.name);
-            session.set(APP_CONSTANTS.USERORG, resp.org);
-            session.set(APP_CONSTANTS.CURRENT_USERROLE, resp.role); 
-            session.set(APP_CONSTANTS.USER_NEEDS_VERIFICATION, resp.verified);
-            session.set(APP_CONSTANTS.USERORGDOMAIN, resp.domain);
-            session.set(APP_CONSTANTS.LOGIN_RESPONSE, resp);
+            session.set(LOGINAPP_CONSTANTS.USERID, resp.id); 
+            session.set(LOGINAPP_CONSTANTS.USERNAME, resp.name);
+            session.set(LOGINAPP_CONSTANTS.USERORG, resp.org);
+            session.set(LOGINAPP_CONSTANTS.CURRENT_USERROLE, resp.role); 
+            session.set(LOGINAPP_CONSTANTS.USER_NEEDS_VERIFICATION, resp.verified);
+            session.set(LOGINAPP_CONSTANTS.USERORGDOMAIN, resp.domain);
+            session.set(LOGINAPP_CONSTANTS.LOGIN_RESPONSE, resp);
             securityguard.setCurrentRole(resp.role);       
             return resp.verified?loginmanager.ID_OK:loginmanager.ID_OK_NOT_YET_VERIFIED;
         } 
@@ -85,19 +85,19 @@ async function signinWithGoogle(googleUser) {
     }
 }
 
-const reset = id => apiman.rest(APP_CONSTANTS.API_RESET, "GET", {id, lang: i18n.getSessionLang(), bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC)});
+const reset = id => apiman.rest(LOGINAPP_CONSTANTS.API_RESET, "GET", {id, lang: i18n.getSessionLang(), bgc: session.get(LOGINAPP_CONSTANTS.SESSION_VARIABLE_BGC)});
 
-async function registerOrUpdate(old_id, name=session.get(APP_CONSTANTS.USERNAME), id=session.get(APP_CONSTANTS.USERID), 
-        pass=session.get("__org_monkshu_cuser_pass"), org=session.get(APP_CONSTANTS.USERORG), 
-        totpSecret, totpCode, role=session.get(APP_CONSTANTS.CURRENT_USERROLE), approved) {
+async function registerOrUpdate(old_id, name=session.get(LOGINAPP_CONSTANTS.USERNAME), id=session.get(LOGINAPP_CONSTANTS.USERID), 
+        pass=session.get("__org_monkshu_cuser_pass"), org=session.get(LOGINAPP_CONSTANTS.USERORG), 
+        totpSecret, totpCode, role=session.get(LOGINAPP_CONSTANTS.CURRENT_USERROLE), approved) {
     const pwph = `${id} ${pass}`, isUpdate = old_id?true:false;
     //if mfa is disabled for the session, pass that info to backend
     const disableMFA = isMfaDisabled();
 
-    const req = {old_id, name, id: (isUpdate && session.get(APP_CONSTANTS.USERID))?session.get(APP_CONSTANTS.USERID):id, 
+    const req = {old_id, name, id: (isUpdate && session.get(LOGINAPP_CONSTANTS.USERID))?session.get(LOGINAPP_CONSTANTS.USERID):id, 
         pwph, org, totpSecret, totpCode, role, approved, lang: i18n.getSessionLang(), new_id: isUpdate?id:undefined, 
-        bgc: session.get(APP_CONSTANTS.SESSION_VARIABLE_BGC), dma: disableMFA}; 
-    const resp = await apiman.rest(isUpdate?APP_CONSTANTS.API_UPDATE:APP_CONSTANTS.API_REGISTER, "POST", req, isUpdate?true:false, true);
+        bgc: session.get(LOGINAPP_CONSTANTS.SESSION_VARIABLE_BGC), dma: disableMFA}; 
+    const resp = await apiman.rest(isUpdate?LOGINAPP_CONSTANTS.API_UPDATE:LOGINAPP_CONSTANTS.API_REGISTER, "POST", req, isUpdate?true:false, true);
     if (!resp) {LOG.error(`${isUpdate?"Update":"Registration"} failed for ${id} due to internal error. Null response.`); return loginmanager.ID_INTERNAL_ERROR;}
     else if (!resp.result) {    // registration failed, reasons can be bad OTP, ID exists or some internal error
         LOG.error(`${isUpdate?"Update":"Registration"} failed for ${id} due to ${resp.reason}.`); 
@@ -105,13 +105,13 @@ async function registerOrUpdate(old_id, name=session.get(APP_CONSTANTS.USERNAME)
         resp.reason=="securityerror"?loginmanager.ID_SECURITY_ERROR:resp.reason=="domainerror"?loginmanager.ID_DOMAIN_ERROR:
         loginmanager.ID_INTERNAL_ERROR;
     } else if (resp.result && resp.tokenflag) { // registration/update succeeded and JWT token is generated, so login can proceed
-        session.set(APP_CONSTANTS.USERID, id); 
-        session.set(APP_CONSTANTS.USERNAME, name);
-        session.set(APP_CONSTANTS.USERORG, org);
-        session.set(APP_CONSTANTS.CURRENT_USERROLE, resp.role);
-        session.set(APP_CONSTANTS.USERORGDOMAIN, resp.domain);
-        session.set(APP_CONSTANTS.USER_NEEDS_VERIFICATION, resp.needs_verification);
-        session.set(APP_CONSTANTS.LOGIN_RESPONSE, resp);
+        session.set(LOGINAPP_CONSTANTS.USERID, id); 
+        session.set(LOGINAPP_CONSTANTS.USERNAME, name);
+        session.set(LOGINAPP_CONSTANTS.USERORG, org);
+        session.set(LOGINAPP_CONSTANTS.CURRENT_USERROLE, resp.role);
+        session.set(LOGINAPP_CONSTANTS.USERORGDOMAIN, resp.domain);
+        session.set(LOGINAPP_CONSTANTS.USER_NEEDS_VERIFICATION, resp.needs_verification);
+        session.set(LOGINAPP_CONSTANTS.LOGIN_RESPONSE, resp);
         session.set("__org_monkshu_cuser_pass", pass);
         securityguard.setCurrentRole(resp.role);
         LOG.info(`${isUpdate?"Update":"Registration"} succeeded ${id}.`);
@@ -125,7 +125,7 @@ async function registerOrUpdate(old_id, name=session.get(APP_CONSTANTS.USERNAME)
 async function changepassword(id, pass) {
     const pwph = `${id} ${pass}`;
         
-    const resp = await apiman.rest(APP_CONSTANTS.API_CHANGEPW, "POST", {id, pwph}, true, false);
+    const resp = await apiman.rest(LOGINAPP_CONSTANTS.API_CHANGEPW, "POST", {id, pwph}, true, false);
     if (resp && resp.result) return true;
     else {LOG.error(`Password change failed for ${id}`); return false;}
 }
@@ -137,7 +137,7 @@ const addLogoutListener = (modulePath, exportToCall, functionToCall) => {
 }
 
 async function logout(dueToTimeout) {
-    LOG.info(`Logout of user ID: ${session.get(APP_CONSTANTS.USERID)}${dueToTimeout?" due to timeout":""}.`);
+    LOG.info(`Logout of user ID: ${session.get(LOGINAPP_CONSTANTS.USERID)}${dueToTimeout?" due to timeout":""}.`);
 
     for (const listener of (session.get(LOGOUT_LISTENERS)||[])) {
         try {
@@ -148,13 +148,13 @@ async function logout(dueToTimeout) {
     _stopAutoLogoutTimer(); 
 
     const savedLang = session.get($$.MONKSHU_CONSTANTS.LANG_ID);
-    session.remove(APP_CONSTANTS.USERID); session.remove(APP_CONSTANTS.USERNAME);
-    session.remove(APP_CONSTANTS.USERORG); session.remove("__org_monkshu_cuser_pass");
-    session.set($$.MONKSHU_CONSTANTS.LANG_ID, savedLang); securityguard.setCurrentRole(APP_CONSTANTS.GUEST_ROLE);
+    session.remove(LOGINAPP_CONSTANTS.USERID); session.remove(LOGINAPP_CONSTANTS.USERNAME);
+    session.remove(LOGINAPP_CONSTANTS.USERORG); session.remove("__org_monkshu_cuser_pass");
+    session.set($$.MONKSHU_CONSTANTS.LANG_ID, savedLang); securityguard.setCurrentRole(LOGINAPP_CONSTANTS.GUEST_ROLE);
     
-    if (dueToTimeout) application.main(APP_CONSTANTS.ERROR_HTML, {error: await i18n.get("Timeout_Error"), 
-        button: await i18n.get("Relogin"), link: router.encodeURL(APP_CONSTANTS.LOGIN_HTML)}); 
-    else application.main(APP_CONSTANTS.LOGIN_HTML);
+    if (dueToTimeout) application.main(LOGINAPP_CONSTANTS.ERROR_HTML, {error: await i18n.get("Timeout_Error"), 
+        button: await i18n.get("Relogin"), link: router.encodeURL(LOGINAPP_CONSTANTS.LOGIN_HTML)}); 
+    else application.main(LOGINAPP_CONSTANTS.LOGIN_HTML);
 }
 
 async function checkResetSecurity() {
@@ -162,41 +162,41 @@ async function checkResetSecurity() {
     if (!pageData.url.e || pageData.url.e == "" || !pageData.url.t || pageData.url.e == "") router.doIndexNavigation();
 }
 
-const getSessionUser = _ => { return {id: session.get(APP_CONSTANTS.USERID), name: session.get(APP_CONSTANTS.USERNAME),
-    org: session.get(APP_CONSTANTS.USERORG), role: session.get(APP_CONSTANTS.CURRENT_USERROLE)}; }
+const getSessionUser = _ => { return {id: session.get(LOGINAPP_CONSTANTS.USERID), name: session.get(LOGINAPP_CONSTANTS.USERNAME),
+    org: session.get(LOGINAPP_CONSTANTS.USERORG), role: session.get(LOGINAPP_CONSTANTS.CURRENT_USERROLE)}; }
 
 async function getProfileData(id, time) {
-    const resp = await apiman.rest(APP_CONSTANTS.API_GETPROFILE, "GET", {id, time}, false, true);
+    const resp = await apiman.rest(LOGINAPP_CONSTANTS.API_GETPROFILE, "GET", {id, time}, false, true);
     if (resp && resp.result) return resp; else return null;
 }
 
 function startAutoLogoutTimer() { return;
-    if (!session.get(APP_CONSTANTS.USERID)) return; // no one is logged in
+    if (!session.get(LOGINAPP_CONSTANTS.USERID)) return; // no one is logged in
     
     const events = ["load", "mousemove", "mousedown", "click", "scroll", "keypress"];
-    const resetTimer = _=> {_stopAutoLogoutTimer(); session.set(TIMEOUT_CURRENT, setTimeout(_=>logout(true), APP_CONSTANTS.TIMEOUT));}
+    const resetTimer = _=> {_stopAutoLogoutTimer(); session.set(TIMEOUT_CURRENT, setTimeout(_=>logout(true), LOGINAPP_CONSTANTS.TIMEOUT));}
     for (const event of events) {document.addEventListener(event, resetTimer);}
     resetTimer();   // start the timing
 }
 
 function isMfaDisabled() {
     const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
-    return urlObj.searchParams.get(APP_CONSTANTS.DISABLE_MFA) === "true";
+    return urlObj.searchParams.get(LOGINAPP_CONSTANTS.DISABLE_MFA) === "true";
 }
 
 const interceptPageLoadData = _ => {
     const routeToCallerOnSuccessfulLoginAndRegistration = async data => {
         const urlIncoming = new URL(router.getCurrentURL()), searchParams = urlIncoming.searchParams, search = urlIncoming.search;
-        data.routeonsuccess = searchParams.get(APP_CONSTANTS.SEARCH_PARAM_REDIRECT) ? APP_CONSTANTS.REROUTE_HTML+search : 
-            APP_CONSTANTS.MAIN_HTML;
+        data.routeonsuccess = searchParams.get(LOGINAPP_CONSTANTS.SEARCH_PARAM_REDIRECT) ? LOGINAPP_CONSTANTS.REROUTE_HTML+search : 
+            LOGINAPP_CONSTANTS.MAIN_HTML;
     }
 
     router.addOnLoadPage("*", startAutoLogoutTimer); 
-    router.addOnLoadPageData(APP_CONSTANTS.LOGIN_HTML, routeToCallerOnSuccessfulLoginAndRegistration);
-    router.addOnLoadPageData(APP_CONSTANTS.REGISTER_HTML, routeToCallerOnSuccessfulLoginAndRegistration);
+    router.addOnLoadPageData(LOGINAPP_CONSTANTS.LOGIN_HTML, routeToCallerOnSuccessfulLoginAndRegistration);
+    router.addOnLoadPageData(LOGINAPP_CONSTANTS.REGISTER_HTML, routeToCallerOnSuccessfulLoginAndRegistration);
 }
 
-const isAdmin = _ => session.get(APP_CONSTANTS.CURRENT_USERROLE).toString() == "admin";
+const isAdmin = _ => session.get(LOGINAPP_CONSTANTS.CURRENT_USERROLE).toString() == "admin";
 
 const _stopAutoLogoutTimer = _ => { 
     const currTimeout = session.get(TIMEOUT_CURRENT);

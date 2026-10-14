@@ -12,8 +12,8 @@ let mainmod;
 
 async function main(data, mainModule) {
     mainmod = mainModule;
-    const logindata = session.get(APP_CONSTANTS.LOGIN_RESPONSE), totpQRCodeData = await mainmod.getTOTPQRCode(logindata.totpsec);
-    data.maincontent = await router.loadHTML(`${APP_CONSTANTS.PAGES_PATH}/showeditprofile.html`, {...data,
+    const logindata = session.get(LOGINAPP_CONSTANTS.LOGIN_RESPONSE), totpQRCodeData = await mainmod.getTOTPQRCode(logindata.totpsec);
+    data.maincontent = await router.loadHTML(`${LOGINAPP_CONSTANTS.PAGES_PATH}/showeditprofile.html`, {...data,
         ...loginmanager.getSessionUser(), totpQRCodeData});
 }
 

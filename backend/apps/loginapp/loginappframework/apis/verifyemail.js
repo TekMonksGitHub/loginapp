@@ -4,7 +4,7 @@
  */
 const crypt = require(`${CONSTANTS.LIBDIR}/crypt.js`);
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
-const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
+const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
 const EMAIL_RE = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
 const DEFAULT_EXPIRY_24_HOURS = 24*60*60;   // 24 hours is default email verification expiry
 const DEFAULT_VERIFYRUL_SAFE_TIMERANGE = 10;    // 10 seconds max mismatch between verify URL time and register time
@@ -21,7 +21,7 @@ exports.doService = async jsonReq => {
     if (!result.result) {LOG.error(`Email verification failure due to missing ID: ${id}.`); return CONSTANTS.FALSE_RESULT;}
     if (result.verified == 1) {LOG.error(`Email verification ID already verified: ${id}.`); return CONSTANTS.TRUE_RESULT;}
     if (utils.getUnixEpoch() - result.registerdate > email_expiry_limit) {LOG.error(`Email verification timed out for email: ${id}`); return CONSTANTS.FALSE_RESULT;}
-    if (Math.abs(result.registerdate - urltime) > (APP_CONSTANTS.CONF.verifyurl_safe_time_range_seconds||DEFAULT_VERIFYRUL_SAFE_TIMERANGE)) {
+    if (Math.abs(result.registerdate - urltime) > (LOGINAPP_CONSTANTS.CONF.verifyurl_safe_time_range_seconds||DEFAULT_VERIFYRUL_SAFE_TIMERANGE)) {
         LOG.error(`Email verification url time and user ID register time out of safe range for: ${id}`); return CONSTANTS.FALSE_RESULT; }
 
     result = await userid.verifyEmail(id);
@@ -33,11 +33,11 @@ exports.doService = async jsonReq => {
 }
 
 exports.getEmailExpiryTimeoutInSeconds = _ => {
-    if (APP_CONSTANTS.CONF.email_verification_expiry_timeout_hours) 
-        return APP_CONSTANTS.CONF.email_verification_expiry_timeout_hours*60*60;
-    if (APP_CONSTANTS.CONF.email_verification_expiry_timeout_minutes) 
-        return APP_CONSTANTS.CONF.email_verification_expiry_timeout_minutes*60;
-    if (APP_CONSTANTS.CONF.email_verification_expiry_timeout_seconds) return APP_CONSTANTS.CONF.email_verification_expiry_timeout_seconds;
+    if (LOGINAPP_CONSTANTS.CONF.email_verification_expiry_timeout_hours) 
+        return LOGINAPP_CONSTANTS.CONF.email_verification_expiry_timeout_hours*60*60;
+    if (LOGINAPP_CONSTANTS.CONF.email_verification_expiry_timeout_minutes) 
+        return LOGINAPP_CONSTANTS.CONF.email_verification_expiry_timeout_minutes*60;
+    if (LOGINAPP_CONSTANTS.CONF.email_verification_expiry_timeout_seconds) return LOGINAPP_CONSTANTS.CONF.email_verification_expiry_timeout_seconds;
     return DEFAULT_EXPIRY_24_HOURS;
 }
 
