@@ -7,9 +7,9 @@ const util = require("util");
 const path = require("path");
 const bcryptjs = require("bcryptjs");
 const serverutils = require(`${CONSTANTS.LIBDIR}/utils.js`);
-const DB_PATH = path.resolve(`${APP_CONSTANTS.DB_DIR}/loginapp.db`);
-const DB_CREATION_SQLS = require(`${APP_CONSTANTS.DB_DIR}/loginapp_dbschema.json`);
-const ID_BLACK_WHITE_LISTS = require(`${APP_CONSTANTS.CONF_DIR}/idblackwhitelists.json`)
+const DB_PATH = path.resolve(`${LOGINAPP_CONSTANTS.DB_DIR}/loginapp.db`);
+const DB_CREATION_SQLS = require(`${LOGINAPP_CONSTANTS.DB_DIR}/loginapp_dbschema.json`);
+const ID_BLACK_WHITE_LISTS = require(`${LOGINAPP_CONSTANTS.CONF_DIR}/idblackwhitelists.json`)
 const db = require(`${CONSTANTS.LIBDIR}/db.js`).getDBDriver("sqlite", DB_PATH, DB_CREATION_SQLS);
 
 const idDeletionListeners = [];
@@ -154,7 +154,7 @@ exports.deleteAllUnverifiedAndExpiredAccounts = async verificationExpiryInSecond
 exports.updateLoginStats = async (id, date, ip="unknown") => {
 	const rows = (await db.getQuery("SELECT * FROM users WHERE id = ? COLLATE NOCASE", [id]))[0];
 	const currentLoginsAndIPsJSON = JSON.parse(rows.loginsandips_json||"[]"); currentLoginsAndIPsJSON.unshift({date, ip});
-	const maxLoginsToRemember = APP_CONSTANTS.CONF.max_logins_to_remember||100;
+	const maxLoginsToRemember = LOGINAPP_CONSTANTS.CONF.max_logins_to_remember||100;
 	if (currentLoginsAndIPsJSON.length > maxLoginsToRemember) currentLoginsAndIPsJSONawait = currentLoginsAndIPsJSON.slice(0, maxLoginsToRemember);
 	await db.runCmd("UPDATE users SET lastlogin=?, lastip=?, loginsandips_json=? WHERE id=?", [date, ip, 
 		JSON.stringify(currentLoginsAndIPsJSON), id]);
@@ -176,11 +176,11 @@ exports.shouldAllowDomain = async domain => {
 		"domain", domain => domain.toLowerCase())[0];
 
 	// if in whitelist only mode activated so check if this domain or this org's main domain is whitelisted
-	if (APP_CONSTANTS.CONF.id_whitelist_mode) return ID_BLACK_WHITE_LISTS.whitelist.includes((orgMainDomain||domain).toLowerCase());	
+	if (LOGINAPP_CONSTANTS.CONF.id_whitelist_mode) return ID_BLACK_WHITE_LISTS.whitelist.includes((orgMainDomain||domain).toLowerCase());	
 	// blacklist check
 	const isSubdomainOrMainDomainInBlacklist = ID_BLACK_WHITE_LISTS.blacklist.includes(domain.toLowerCase()) || 
 		ID_BLACK_WHITE_LISTS.blacklist.includes((orgMainDomain||domain).toLowerCase());
-	if (APP_CONSTANTS.CONF.id_blacklist_mode) return (!isSubdomainOrMainDomainInBlacklist);	
+	if (LOGINAPP_CONSTANTS.CONF.id_blacklist_mode) return (!isSubdomainOrMainDomainInBlacklist);	
 }
 
 exports.shouldAllowNewMainDomainForOrg = async domain => {
@@ -188,7 +188,7 @@ exports.shouldAllowNewMainDomainForOrg = async domain => {
 	if (exports.getUsersForDomain(domain).result) return false;
 
 	// if in whitelist only mode activated so check if this domain or this org's main domain is whitelisted
-	if (APP_CONSTANTS.CONF.id_whitelist_mode) return ID_BLACK_WHITE_LISTS.whitelist.includes(domain.toLowerCase());	
+	if (LOGINAPP_CONSTANTS.CONF.id_whitelist_mode) return ID_BLACK_WHITE_LISTS.whitelist.includes(domain.toLowerCase());	
 	// blacklist check
 	return (!ID_BLACK_WHITE_LISTS.blacklist.includes(domain.toLowerCase()));	// should not be blacklisted then
 }

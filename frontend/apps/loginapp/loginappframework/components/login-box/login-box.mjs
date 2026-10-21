@@ -18,7 +18,7 @@ async function elementConnected(host) {
 	data.minlength = host.getAttribute("minlength"); data.COMPONENT_PATH = COMPONENT_PATH;
 	// Check if disable multi-factor authentication (dma) parameter is true in URL
 	const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
-	data.hide_otp = urlObj.searchParams.get(APP_CONSTANTS.DISABLE_MFA) === 'true';
+	data.hide_otp = urlObj.searchParams.get(LOGINAPP_CONSTANTS.DISABLE_MFA) === 'true';
 	login_box.setData(host.id, data);
 }
 
@@ -67,12 +67,12 @@ function _hideErrors(shadowRoot) {
 async function _handleLoginResult(result, shadowRoot, routeOnSuccess, routeOnNotApproved, containedElement) {
 	let data; if (result == loginmanager.ID_OK_NOT_YET_VERIFIED) data = JSON.parse(
 		await router.expandPageData(login_box.getHostElement(containedElement).getAttribute("dataOnSuccessButNotVerified")||"{}",
-		undefined, {name: session.get(APP_CONSTANTS.USERNAME), id: session.get(APP_CONSTANTS.USERID), 
-			org: session.get(APP_CONSTANTS.USERORG), role: securityguard.getCurrentRole(), needs_verification: true}));
+		undefined, {name: session.get(LOGINAPP_CONSTANTS.USERNAME), id: session.get(LOGINAPP_CONSTANTS.USERID), 
+			org: session.get(LOGINAPP_CONSTANTS.USERORG), role: securityguard.getCurrentRole(), needs_verification: true}));
 	if (result == loginmanager.ID_OK) data = JSON.parse(
 		await router.expandPageData(login_box.getHostElement(containedElement).getAttribute("dataOnSuccess")||"{}",
-		undefined, {name: session.get(APP_CONSTANTS.USERNAME), id: session.get(APP_CONSTANTS.USERID), 
-			org: session.get(APP_CONSTANTS.USERORG), role: securityguard.getCurrentRole(), needs_verification: false}));
+		undefined, {name: session.get(LOGINAPP_CONSTANTS.USERNAME), id: session.get(LOGINAPP_CONSTANTS.USERID), 
+			org: session.get(LOGINAPP_CONSTANTS.USERORG), role: securityguard.getCurrentRole(), needs_verification: false}));
 			
 	switch (result) {
 		case loginmanager.ID_OK: router.loadPage(routeOnSuccess, data); break;

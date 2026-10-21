@@ -5,11 +5,11 @@
 const mustache = require('mustache');
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const crypt = require(`${CONSTANTS.LIBDIR}/crypt.js`);
-const totp = require(`${APP_CONSTANTS.LIB_DIR}/totp.js`);
-const mailer = require(`${APP_CONSTANTS.LIB_DIR}/mailer.js`);
-const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
+const totp = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/totp.js`);
+const mailer = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/mailer.js`);
+const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
 const queueExecutor = require(`${CONSTANTS.LIBDIR}/queueExecutor.js`);
-const emailTemplate = require(`${APP_CONSTANTS.CONF_DIR}/email.json`);
+const emailTemplate = require(`${LOGINAPP_CONSTANTS.CONF_DIR}/email.json`);
 
 const DEFAULT_QUEUE_DELAY = 500, NEW_USER_LISTENERS_MEMORY_KEY = "__org_monkshu_loginapp_registeration_listeners", 
 	REASONS = {ID_EXISTS: "exists", OTP_ERROR: "otp", INTERNAL_ERROR: "internal", 
@@ -42,12 +42,12 @@ exports.addUser = async (jsonReq, servObject, byAdmin=false) => {
 
 	const rootOrg = await userid.getRootOrgForDomain(exports.getRootDomain(jsonReq)),	// rootOrg is null if domain is whitelisted but first registration for the org
 		existingUsersForThisUsersRootOrg = rootOrg?await userid.getUsersForRootOrg(rootOrg):false,
-		approved = byAdmin ? jsonReq.approved : (APP_CONSTANTS.CONF.new_users_need_approval_from_admin?
+		approved = byAdmin ? jsonReq.approved : (LOGINAPP_CONSTANTS.CONF.new_users_need_approval_from_admin?
 			(existingUsersForThisUsersRootOrg?0:1) : 1),
 		role = byAdmin ? jsonReq.role : (existingUsersForThisUsersRootOrg?"user":"admin"), 
-		verifyEmail = byAdmin ? jsonReq.verifyEmail : (APP_CONSTANTS.CONF.verify_email_on_registeration ? 1 : 0);
+		verifyEmail = byAdmin ? jsonReq.verifyEmail : (LOGINAPP_CONSTANTS.CONF.verify_email_on_registeration ? 1 : 0);
 
-	const result = await userid.register(jsonReq.id, jsonReq.name, jsonReq.org, jsonReq.pwph, jsonReq.totpSecret || APP_CONSTANTS.TOTP_BYPASS_FLAG, role, 
+	const result = await userid.register(jsonReq.id, jsonReq.name, jsonReq.org, jsonReq.pwph, jsonReq.totpSecret || LOGINAPP_CONSTANTS.TOTP_BYPASS_FLAG, role, 
 		approved, verifyEmail, jsonReq.domain);
 	if ((!result) || ((!result.result) && result.reason != userid.ID_EXISTS)) LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id} DB error.`);
 	else if (!result.result) LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id} exists already.`);
@@ -71,7 +71,7 @@ exports.addUser = async (jsonReq, servObject, byAdmin=false) => {
 	if (result.result) {
 		LOG.info(`User registered: ${result.name}, ID: ${result.id}, approval status is: ${result.approved==1?true:false}`); 
 		if (result.approved && (!byAdmin)) queueExecutor.add(userid.updateLoginStats, [result.id, Date.now(), 
-			utils.getClientIP(servObject.req)], true, APP_CONSTANTS.CONF.login_update_delay||DEFAULT_QUEUE_DELAY);
+			utils.getClientIP(servObject.req)], true, LOGINAPP_CONSTANTS.CONF.login_update_delay||DEFAULT_QUEUE_DELAY);
 		if (!result.approved) queueExecutor.add(_emailAdminNewRegistration, [result.id, result.name, result.org, jsonReq.lang, jsonReq.bgc], 
 			true, DEFAULT_QUEUE_DELAY);
 	}
@@ -127,7 +127,7 @@ exports.REASONS = REASONS;
 
 async function _emailAccountVerification(id, name, org, lang, bgc) {
 	const cryptID = crypt.encrypt(id), cryptTime = crypt.encrypt(utils.getUnixEpoch().toString()), 
-        action_url = APP_CONSTANTS.CONF.base_url + Buffer.from(`${APP_CONSTANTS.CONF.verify_url}?e=${encodeURIComponent(cryptID)}&t=${encodeURIComponent(cryptTime)}${bgc?`&bgc=${encodeURIComponent(bgc)}`:""}`).toString("base64"),
+        action_url = LOGINAPP_CONSTANTS.CONF.base_url + Buffer.from(`${LOGINAPP_CONSTANTS.CONF.verify_url}?e=${encodeURIComponent(cryptID)}&t=${encodeURIComponent(cryptTime)}${bgc?`&bgc=${encodeURIComponent(bgc)}`:""}`).toString("base64"),
         button_code_pre = mustache.render(emailTemplate.button_code_pre, {action_url}), 
 			button_code_post = mustache.render(emailTemplate.button_code_post, {action_url}),
         email_title = mustache.render(emailTemplate[`${lang||"en"}_verifyemail_title`], {name, org, action_url}),
@@ -142,7 +142,7 @@ async function _emailAdminNewRegistration(id, name, org, lang, bgc) {
 	const admins = await userid.getAdminsFor(id); if (!admins) {LOG.error(`No admins found for user ${id}, skipping notifying new registration for the org.`); return;}
 	for (const admin of admins) {	// email all admins that a new user has registered and needs approval
 		const email = admin.id, adminname = admin.name, 
-		action_url = APP_CONSTANTS.CONF.base_url + Buffer.from(`${APP_CONSTANTS.CONF.login_url}${bgc?`?bgc=${encodeURIComponent(bgc)}`:""}`).toString("base64"),
+		action_url = LOGINAPP_CONSTANTS.CONF.base_url + Buffer.from(`${LOGINAPP_CONSTANTS.CONF.login_url}${bgc?`?bgc=${encodeURIComponent(bgc)}`:""}`).toString("base64"),
 		button_code_pre = mustache.render(emailTemplate.button_code_pre, {action_url}), 
 		button_code_post = mustache.render(emailTemplate.button_code_post, {action_url}),
 		email_title = mustache.render(emailTemplate[`${lang||"en"}_newregistrationemail_title`], {adminname, org, name, id, action_url}),

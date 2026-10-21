@@ -32,8 +32,8 @@
  * (C) 2022 TekMonks. All rights reserved.
  */
 
-const login = require(`${APP_CONSTANTS.API_DIR}/login.js`);
-const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
+const login = require(`${LOGINAPP_CONSTANTS.API_DIR}/login.js`);
+const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
 
 const DEFAULT_TRANSFER_TOKEN_TIMEOUT = 180000, DEFAULT_ISS = "login.tekmonks.com";
 
@@ -49,11 +49,11 @@ exports.doService = async (jsonReq, _servObject, headers, _url, _apiconf) => {
 	else {LOG.error(`Unable to locate user for ID ${id}, DB error.`); return CONSTANTS.FALSE_RESULT;}
 
     const jwtTokenManager = APIREGISTRY.getExtension("jwtTokenManager"), tokenExpiryDelay = 
-		jsonReq.transfer_token_timeout||APP_CONSTANTS.CONF.transfer_token_timeout||DEFAULT_TRANSFER_TOKEN_TIMEOUT;
+		jsonReq.transfer_token_timeout||LOGINAPP_CONSTANTS.CONF.transfer_token_timeout||DEFAULT_TRANSFER_TOKEN_TIMEOUT;
 	const token = jwtTokenManager.createSignedJWTToken({id: userdetails.id, name: userdetails.name, org: userdetails.org,
         suborg: userdetails.suborg, role: userdetails.role, approved: userdetails.approved == 1, 
 		verified: userdetails.verified == 1, onetimekey: jsonReq.onetimekey, appname: jsonReq.appname, 
-		expiryInterval: tokenExpiryDelay, iss: APP_CONSTANTS.CONF.jwt_iss||DEFAULT_ISS});
+		expiryInterval: tokenExpiryDelay, iss: LOGINAPP_CONSTANTS.CONF.jwt_iss||DEFAULT_ISS});
     
     return {jwt: token, ...CONSTANTS.TRUE_RESULT};
 }

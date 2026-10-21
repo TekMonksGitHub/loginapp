@@ -5,7 +5,7 @@
  * See enclosed LICENSE file.
  */
 const crypt = require(CONSTANTS.LIBDIR+"/crypt.js");
-const conf = require(`${APP_CONSTANTS.CONF_DIR}/smtp.json`);
+const conf = require(`${LOGINAPP_CONSTANTS.CONF_DIR}/smtp.json`);
 const serverMailer = require(CONSTANTS.LIBDIR+"/mailer.js");
 const nodemailer = require("nodemailer");
 const mailgunTransport = require("nodemailer-mailgun-transport");

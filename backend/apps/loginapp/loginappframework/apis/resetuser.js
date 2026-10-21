@@ -4,9 +4,9 @@
  */
 const mustache = require('mustache');
 const crypt = require(`${CONSTANTS.LIBDIR}/crypt.js`);
-const mailer = require(`${APP_CONSTANTS.LIB_DIR}/mailer.js`);
-const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
-const template = require(`${APP_CONSTANTS.CONF_DIR}/email.json`);
+const mailer = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/mailer.js`);
+const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
+const template = require(`${LOGINAPP_CONSTANTS.CONF_DIR}/email.json`);
 
 exports.doService = async jsonReq => {
 	if (!validateRequest(jsonReq)) {LOG.error("Validation failure."); return CONSTANTS.FALSE_RESULT;}
@@ -20,7 +20,7 @@ exports.doService = async jsonReq => {
     }
     
     const cryptID = crypt.encrypt(jsonReq.id), cryptTime = crypt.encrypt(Date.now().toString()), 
-        action_url = APP_CONSTANTS.CONF.base_url + Buffer.from(`${APP_CONSTANTS.CONF.reset_url}?e=${encodeURIComponent(cryptID)}&t=${encodeURIComponent(cryptTime)}${jsonReq.bgc?`&bgc=${encodeURIComponent(jsonReq.bgc)}`:""}`).toString("base64"),
+        action_url = LOGINAPP_CONSTANTS.CONF.base_url + Buffer.from(`${LOGINAPP_CONSTANTS.CONF.reset_url}?e=${encodeURIComponent(cryptID)}&t=${encodeURIComponent(cryptTime)}${jsonReq.bgc?`&bgc=${encodeURIComponent(jsonReq.bgc)}`:""}`).toString("base64"),
         button_code_pre = mustache.render(template.button_code_pre, {action_url}), button_code_post = mustache.render(template.button_code_post, {action_url}),
         email_title = mustache.render(template[`${jsonReq.lang||"en"}_resetuser_title`], {name: checkExists.name, org: checkExists.org, action_url}),
         email_html = mustache.render(template[`${jsonReq.lang||"en"}_resetuser_email_html`], {name: checkExists.name, org: checkExists.org, button_code_pre, button_code_post}),

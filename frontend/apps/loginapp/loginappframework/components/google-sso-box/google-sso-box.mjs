@@ -44,9 +44,9 @@ async function _handleLoginResult(result, _, hostElement) {
     const routeOnNotApproved = hostElement.getAttribute("routeOnNotApproved") || "./notapproved.html";
 
     const commonUserData = {
-        name: session.get(APP_CONSTANTS.USERNAME),
-        id: session.get(APP_CONSTANTS.USERID),
-        org: session.get(APP_CONSTANTS.USERORG),
+        name: session.get(LOGINAPP_CONSTANTS.USERNAME),
+        id: session.get(LOGINAPP_CONSTANTS.USERID),
+        org: session.get(LOGINAPP_CONSTANTS.USERORG),
         role: securityguard.getCurrentRole()
     };
 

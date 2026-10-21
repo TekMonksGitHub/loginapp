@@ -6,11 +6,11 @@
  */
 const mustache = require('mustache');
 const crypt = require(`${CONSTANTS.LIBDIR}/crypt.js`);
-const totp = require(`${APP_CONSTANTS.LIB_DIR}/totp.js`);
-const login = require(`${APP_CONSTANTS.API_DIR}/login.js`);
-const mailer = require(`${APP_CONSTANTS.LIB_DIR}/mailer.js`);
-const register = require(`${APP_CONSTANTS.API_DIR}/register.js`);
-const template = require(`${APP_CONSTANTS.CONF_DIR}/email.json`);
+const totp = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/totp.js`);
+const login = require(`${LOGINAPP_CONSTANTS.API_DIR}/login.js`);
+const mailer = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/mailer.js`);
+const register = require(`${LOGINAPP_CONSTANTS.API_DIR}/register.js`);
+const template = require(`${LOGINAPP_CONSTANTS.CONF_DIR}/email.json`);
 
 exports.doService = async (jsonReq, servObject, headers) => {
     if (!validateRequest(jsonReq)) {LOG.error("Validation failure."); return CONSTANTS.FALSE_RESULT;}
@@ -25,7 +25,7 @@ exports.doService = async (jsonReq, servObject, headers) => {
         LOG.info(`User registered ${jsonReq.name}, ID: ${jsonReq.new_id}, by admin with ID: ${login.getID(headers)}, emailing them initial login instructions.`); 
 
         const cryptID = crypt.encrypt(jsonReq.new_id), cryptTime = crypt.encrypt(Date.now().toString()), 
-            action_url = APP_CONSTANTS.CONF.base_url + Buffer.from(`${APP_CONSTANTS.CONF.initiallogin_url}?e=${encodeURIComponent(cryptID)}&t=${encodeURIComponent(cryptTime)}${jsonReq.bgc?`&bgc=${encodeURIComponent(jsonReq.bgc)}`:""}`).toString("base64"),
+            action_url = LOGINAPP_CONSTANTS.CONF.base_url + Buffer.from(`${LOGINAPP_CONSTANTS.CONF.initiallogin_url}?e=${encodeURIComponent(cryptID)}&t=${encodeURIComponent(cryptTime)}${jsonReq.bgc?`&bgc=${encodeURIComponent(jsonReq.bgc)}`:""}`).toString("base64"),
             button_code_pre = mustache.render(template.button_code_pre, {action_url}), button_code_post = mustache.render(template.button_code_post, {action_url}),
             email_title = mustache.render(template[`${jsonReq.lang}_adduser_title`], {name: jsonReq.name, org, action_url}),
             email_html = mustache.render(template[`${jsonReq.lang}_adduser_email_html`], {name: jsonReq.name, org, button_code_pre, button_code_post}),

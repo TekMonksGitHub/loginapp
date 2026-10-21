@@ -145,18 +145,18 @@ span.error {color: #FF716D;}
 
 span.link:hover {text-decoration: underline;}
 </style>
-{{{APP_CONSTANTS.CSS_STYLETAG_START}}}
-	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{APP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
-	.advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{APP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
-{{{APP_CONSTANTS.CSS_STYLETAG_END}}}
+{{{LOGINAPP_CONSTANTS.CSS_STYLETAG_START}}}
+	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{LOGINAPP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
+	.advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{LOGINAPP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
+{{{LOGINAPP_CONSTANTS.CSS_STYLETAG_END}}}
 
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
 	div#maincontent {flex-direction: column;}
 	div#header {justify-content: space-around; height: 6em;}
 	.lgbox {padding: 1em; box-shadow: none;}
 	.advtextbox {margin-bottom: min(10%, 4em);}
 	div#backimage {background-position: center 1em;}
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
 
 <!doctype html>
 <html>
@@ -179,7 +179,7 @@ span.link:hover {text-decoration: underline;}
 <div id="bodydiv">
 <div id="header">
 <span id="imgheader">
-	<img class="logo" src="./img/logo.svg" onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')"></img>
+	<img class="logo" src="./img/logo.svg" onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')"></img>
 </span>
 </div>
 
@@ -187,14 +187,14 @@ span.link:hover {text-decoration: underline;}
 <div class="advtextbox">
 	<h1>{{i18n.logintagline}}</h1>
 	<h2>{{i18n.loginsubtag}}</h2>
-	<p onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')">{{i18n.learn}}</p>
+	<p onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')">{{i18n.learn}}</p>
 </div>
 
 <div class="lgbox">
 	<span {{^emailVerified}}class="error"{{/emailVerified}}>{{emailVerifyMsg}}</span>
 	{{#emailVerified}}<span id="linklogin" onclick="
 		const router = monkshu_env.frameworklibs.router, urlcurrent = new window.URL(router.getCurrentURL());
-		const urltogoto = `${APP_CONSTANTS.LOGIN_HTML}${urlcurrent.search}`; 
+		const urltogoto = `${LOGINAPP_CONSTANTS.LOGIN_HTML}${urlcurrent.search}`; 
 		router.navigate(urltogoto);">{{i18n.ClickHereToContinueLogin}}</span>{{/emailVerified}}
 </div>
 </div>

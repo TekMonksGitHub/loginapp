@@ -49,38 +49,38 @@ function showLoginMessages() {
 
 const logoutClicked = _ => loginmanager.logout();
 
-const interceptPageData = _ => router.addOnLoadPageData(APP_CONSTANTS.MAIN_HTML, async data => {   // set admin role if applicable
-    if (securityguard.getCurrentRole()==APP_CONSTANTS.ADMIN_ROLE) data.admin = true; 
+const interceptPageData = _ => router.addOnLoadPageData(LOGINAPP_CONSTANTS.MAIN_HTML, async data => {   // set admin role if applicable
+    if (securityguard.getCurrentRole()==LOGINAPP_CONSTANTS.ADMIN_ROLE) data.admin = true; 
     
-    const embeddedAppName = APP_CONSTANTS.EMBEDDED_APP_NAME?APP_CONSTANTS.EMBEDDED_APP_NAME.trim():undefined;
+    const embeddedAppName = LOGINAPP_CONSTANTS.EMBEDDED_APP_NAME?LOGINAPP_CONSTANTS.EMBEDDED_APP_NAME.trim():undefined;
     if (embeddedAppName) try { 
-        const embeddedappMainMJS = await import(`${APP_CONSTANTS.APP_PATH}/${embeddedAppName}/js/${embeddedAppName}.mjs`); 
+        const embeddedappMainMJS = await import(`${LOGINAPP_CONSTANTS.APP_PATH}/${embeddedAppName}/js/${embeddedAppName}.mjs`); 
         data = await embeddedappMainMJS[embeddedAppName].main(data, main); 
     } catch (err) { LOG.error(`Error in initializing embeded app ${embeddedAppName}, error is ${err}.`); }
 });
 
 async function gohome() {
     for (const listener of gohomeListeners) await listener();
-    router.navigate(APP_CONSTANTS.MAIN_HTML);
+    router.navigate(LOGINAPP_CONSTANTS.MAIN_HTML);
 }
 
 const addGoHomeListener = listener => gohomeListeners.push(listener);
 
 async function getTOTPQRCode(key) {
 	const title = await i18n.get("Title");
-	await $$.require(`${APP_CONSTANTS.COMPONENTS_PATH}/register-box/3p/qrcode.min.js`);
+	await $$.require(`${LOGINAPP_CONSTANTS.COMPONENTS_PATH}/register-box/3p/qrcode.min.js`);
 	return new Promise(resolve => QRCode.toDataURL(
 	    `otpauth://totp/${title}?secret=${key}&issuer=TekMonks&algorithm=sha1&digits=6&period=30`, (_, data_url) => resolve(data_url)));
 }
 
 async function showLongTermToken(_element) {
-    const jwtTransferResult = await apiman.rest(APP_CONSTANTS.API_GETTRANSFERJWT, "GET", 
-        {appname: APP_CONSTANTS.APP_NAME, onetimekey: Date.now()+Math.random().toString().split(".")[1], 
-            transfer_token_timeout: APP_CONSTANTS.LONG_TERM_JWT_EXPIRY}, true); 
+    const jwtTransferResult = await apiman.rest(LOGINAPP_CONSTANTS.API_GETTRANSFERJWT, "GET", 
+        {appname: LOGINAPP_CONSTANTS.APP_NAME, onetimekey: Date.now()+Math.random().toString().split(".")[1], 
+            transfer_token_timeout: LOGINAPP_CONSTANTS.LONG_TERM_JWT_EXPIRY}, true); 
     if (!jwtTransferResult || !jwtTransferResult.result) {
         _doErrorLogout("JWT transfer token call failed, unified login not possible."); return; }
     
-    dialog().showDialog(`${APP_CONSTANTS.DIALOGS_PATH}/showjwt.html`, await i18n.get("Copy"), await i18n.get("Close"), 
+    dialog().showDialog(`${LOGINAPP_CONSTANTS.DIALOGS_PATH}/showjwt.html`, await i18n.get("Copy"), await i18n.get("Close"), 
         {jwt: jwtTransferResult.jwt}, "dialog");
 }
 

@@ -4,8 +4,8 @@
  * (C) 2021 TekMonks. All rights reserved.
  * See enclosed LICENSE file.
  */
-const userid = require(APP_CONSTANTS.LIB_DIR+"/userid.js");
-const verifyemail = require(APP_CONSTANTS.API_DIR+"/verifyemail.js");
+const userid = require(LOGINAPP_CONSTANTS.LIB_DIR+"/userid.js");
+const verifyemail = require(LOGINAPP_CONSTANTS.API_DIR+"/verifyemail.js");
 
 const DEFAULT_CLEANUP_FREQUENCY = 600000;
 
@@ -16,4 +16,4 @@ module.exports.init = _ => setInterval(_=>
             if (result.result && result.usersDropped.length) LOG.info(`Dropped the following unverified users, whose verification periods expired ${result.usersDropped}`); 
         } catch (err) {LOG.error(`Encountered the following error while trying to find and drop unverified users: ${err}`);}
     },
-    APP_CONSTANTS.CONF.cleanup_unverified_accounts_frequency||DEFAULT_CLEANUP_FREQUENCY);
+    LOGINAPP_CONSTANTS.CONF.cleanup_unverified_accounts_frequency||DEFAULT_CLEANUP_FREQUENCY);

@@ -4,10 +4,10 @@
  * lateral attacks. An org change must be done via a new account.
  * (C) 2015 TekMonks. All rights reserved.
  */
-const totp = require(`${APP_CONSTANTS.LIB_DIR}/totp.js`);
-const login = require(`${APP_CONSTANTS.API_DIR}/login.js`);
-const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
-const register = require(`${APP_CONSTANTS.API_DIR}/register.js`);
+const totp = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/totp.js`);
+const login = require(`${LOGINAPP_CONSTANTS.API_DIR}/login.js`);
+const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
+const register = require(`${LOGINAPP_CONSTANTS.API_DIR}/register.js`);
 
 const idChangeListeners = [];
 

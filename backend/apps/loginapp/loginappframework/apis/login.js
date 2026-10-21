@@ -3,14 +3,14 @@
  * (C) 2015 TekMonks. All rights reserved.
  */
 const utils = require(`${CONSTANTS.LIBDIR}/utils.js`);
-const totp = require(`${APP_CONSTANTS.LIB_DIR}/totp.js`);
-const userid = require(`${APP_CONSTANTS.LIB_DIR}/userid.js`);
-const register = require(`${APP_CONSTANTS.API_DIR}/register.js`);
+const totp = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/totp.js`);
+const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
+const register = require(`${LOGINAPP_CONSTANTS.API_DIR}/register.js`);
 const jwttokenmanager = APIREGISTRY.getExtension("JWTTokenManager");
 const queueExecutor = require(`${CONSTANTS.LIBDIR}/queueExecutor.js`);
 const path = require("path");
-const DB_PATH = path.resolve(`${APP_CONSTANTS.DB_DIR}/loginapp.db`);
-const DB_CREATION_SQLS = require(`${APP_CONSTANTS.DB_DIR}/loginapp_dbschema.json`);
+const DB_PATH = path.resolve(`${LOGINAPP_CONSTANTS.DB_DIR}/loginapp.db`);
+const DB_CREATION_SQLS = require(`${LOGINAPP_CONSTANTS.DB_DIR}/loginapp_dbschema.json`);
 const db = require(`${CONSTANTS.LIBDIR}/db.js`).getDBDriver("sqlite", DB_PATH, DB_CREATION_SQLS);
 const { OAuth2Client } = require('google-auth-library');
 
@@ -67,7 +67,7 @@ exports.doService = async (jsonReq, servObject) => {
 	result.tokenflag = false; 	// default assume login failed no JWT token will be generated
 	if (result.result && result.approved) {	// perform second factor
 		//dma flag is to disable mutifactor authentication
-		if (jsonReq?.dma === true || result.totpsec === APP_CONSTANTS.TOTP_BYPASS_FLAG) { result.result = true; result.tokenflag = true; result.reason = REASONS.OK;
+		if (jsonReq?.dma === true || result.totpsec === LOGINAPP_CONSTANTS.TOTP_BYPASS_FLAG) { result.result = true; result.tokenflag = true; result.reason = REASONS.OK;
 			LOG.info(`User ${result.id} logged in with MFA bypassed.`);
 		} else {
 		result.result = totp.verifyTOTP(result.totpsec, jsonReq.otp); 
@@ -87,12 +87,12 @@ exports.doService = async (jsonReq, servObject) => {
 	}
 
 	if (result.tokenflag) {	// tokenflag means generate JWT, meaning login succeeded
-		LOG.info(`User logged in: ${result.id}${APP_CONSTANTS.CONF.verify_email_on_registeration?`, email verification status is ${result.verified}.`:"."}`); 
+		LOG.info(`User logged in: ${result.id}${LOGINAPP_CONSTANTS.CONF.verify_email_on_registeration?`, email verification status is ${result.verified}.`:"."}`); 
 		const remoteIP = utils.getClientIP(servObject.req);	// api end closes the socket so when the queue task runs remote IP is lost.
 		queueExecutor.add(async _=>{	// update login stats don't care much if it fails
 			try { await userid.updateLoginStats(jsonReq.id, Date.now(), remoteIP); }
 			catch(err) {LOG.error(`Error updating login stats for ID ${jsonReq.id}. Error is ${err}.`);}
-		}, undefined, true, APP_CONSTANTS.CONF.login_update_delay||DEFAULT_QUEUE_DELAY);
+		}, undefined, true, LOGINAPP_CONSTANTS.CONF.login_update_delay||DEFAULT_QUEUE_DELAY);
 	} else LOG.error(`Bad login or not approved for ID: ${jsonReq.id}.`);
 
 	if (!result.tokenflag) return {result: false, reason: result.reason};
@@ -129,7 +129,7 @@ exports.getRole = headers => {
 	return logins[headers["authorization"].toLowerCase()]?logins[headers["authorization"].toLowerCase()].role:null;
 }
 
-exports.isAdmin = headers => (exports.getRole(headers))?.toLowerCase() == APP_CONSTANTS.ROLES.ADMIN.toLowerCase();
+exports.isAdmin = headers => (exports.getRole(headers))?.toLowerCase() == LOGINAPP_CONSTANTS.ROLES.ADMIN.toLowerCase();
 
 exports.isIDAdminForOrg = async (id, org) => {
 	const adminsForOrg = await userid.getAdminsForOrgOrSuborg(org); 

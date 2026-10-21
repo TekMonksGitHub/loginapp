@@ -153,19 +153,19 @@ div.lgbox > span {
 	font-size: x-small;
 }
 </style>
-{{{APP_CONSTANTS.CSS_STYLETAG_START}}}
-	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{APP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
-	span#signin, .advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{APP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
+{{{LOGINAPP_CONSTANTS.CSS_STYLETAG_START}}}
+	body { background-color: {{#url.bgc}}{{{.}}}{{/url.bgc}}{{^url.bgc}}{{LOGINAPP_CONSTANTS.DEFAULT_BGC}};{{/url.bgc}} }
+	span#signin, .advtextbox, .langbox { color: {{#url.txtc}}{{{.}}}{{/url.txtc}}{{^url.txtc}}{{LOGINAPP_CONSTANTS.DEFAULT_TXTC}};{{/url.txtc}} }
 	{{#url.txtc}}img.logo, div#backimage { filter: invert(1); }{{/url.txtc}}
-{{{APP_CONSTANTS.CSS_STYLETAG_END}}}
+{{{LOGINAPP_CONSTANTS.CSS_STYLETAG_END}}}
 
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_START}}}
 	div#maincontent {flex-direction: column;}
 	div#header {flex-direction: column-reverse; height: 6em;}
 	span#signin {text-align: center;}
 	.lgbox {padding: 1em; box-shadow: none;}
 	div#backimage {background-position: center 1em;}
-{{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
+{{{LOGINAPP_CONSTANTS.MOBILE_MEDIA_QUERY_END}}}
 
 
 <!doctype html>
@@ -188,7 +188,7 @@ div.lgbox > span {
 <div id="bodydiv">
 <div id="header">
 <span id="imgheader">
-	<img class="logo" src="./img/logo.svg" onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')"></img>
+	<img class="logo" src="./img/logo.svg" onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')"></img>
 </span>
 <span id="signin">
 	<span><a href="{{#_org_monkshu_makeLink}}./register.html{{{url.url_search}}}{{/_org_monkshu_makeLink}}">{{i18n.Register}}</a></span>
@@ -200,19 +200,19 @@ div.lgbox > span {
 <div class="advtextbox">
 	<h1>{{i18n.logintagline}}</h1>
 	<h2>{{i18n.loginsubtag}}</h2>
-	<p onclick="window.open(APP_CONSTANTS.APP_ABOUT_URL, '_blank')">{{i18n.learn}}</p>
+	<p onclick="window.open(LOGINAPP_CONSTANTS.APP_ABOUT_URL, '_blank')">{{i18n.learn}}</p>
 </div>
 
 <div class="lgbox">
 	<span><br><br>{{i18n.LoginMsg}}<br><br></span>
-	<login-box routeOnSuccess="{{{routeonsuccess}}}" minlength="{{APP_CONSTANTS.MIN_PASS_LENGTH}}"
+	<login-box routeOnSuccess="{{{routeonsuccess}}}" minlength="{{LOGINAPP_CONSTANTS.MIN_PASS_LENGTH}}"
 		dataOnSuccessButNotVerified='{"showDialog":{"message": "&#x7B;&#x7B;#needs_verification&#x7D;&#x7D;{{i18n.LoginSuccessNeedsVerification}}&#x7B;&#x7B;/needs_verification&#x7D;&#x7D;&#x7B;&#x7B;^needs_verification&#x7D;&#x7D;{{i18n.RegisterSuccess}}&#x7B;&#x7B;/needs_verification}}"}}'
 		routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}{{#url.txtc}}{{#url.bgc}}&{{/url.bgc}}{{^url.bgc}}?{{/url.bgc}}txtc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.txtc}}"></login-box>
 		<google-sso-box
 			routeOnSuccess="{{{routeonsuccess}}}"
 			routeOnNotApproved="./notapproved.html{{#url.bgc}}?bgc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.bgc}}{{#url.txtc}}{{#url.bgc}}&{{/url.bgc}}{{^url.bgc}}?{{/url.bgc}}txtc={{#_org_monkshu_encodeURIComponent}}{{{.}}}{{/_org_monkshu_encodeURIComponent}}{{/url.txtc}}">
 			<div id="g_id_onload"
-			data-client_id="{{APP_CONSTANTS.GOOGLE_CLIENT_ID}}"
+			data-client_id="{{LOGINAPP_CONSTANTS.GOOGLE_CLIENT_ID}}"
 			data-callback="onGoogleSignIn">
 			</div>
 			<div style="width: 100%; display: flex; justify-content: center; margin-top: 1.5em;">
