@@ -18,7 +18,7 @@ async function elementConnected(host) {
 	data.minlength = host.getAttribute("minlength"); data.COMPONENT_PATH = COMPONENT_PATH;
 	// Check if disable multi-factor authentication (dma) parameter is true in URL
 	const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
-	data.hide_otp = urlObj.searchParams.get(LOGINAPP_CONSTANTS.DISABLE_MFA) === 'true';
+	data.hide_otp = loginmanager.isMfaDisabled();
 	login_box.setData(host.id, data);
 }
 

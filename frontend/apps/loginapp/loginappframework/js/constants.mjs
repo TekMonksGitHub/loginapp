@@ -13,10 +13,11 @@ const CONF_PATH = `${LOGINAPP_PATH}/conf`;
 const COMPONENTS_PATH = `${LOGINAPP_PATH}/components`;
 const API_PATH = `${BACKEND}/apps/${APP_NAME}`;
 const DISABLE_MFA = "dma"; // no second factor
+const LOCAL_DEPLOYMENT = false; // set to true if the loginapp is deployed locally. This will disable the MFA for local deployments.
 
 export const LOGINAPP_CONSTANTS = {
     FRONTEND, BACKEND, APP_PATH, APP_NAME, COMPONENTS_PATH, API_PATH, CONF_PATH, LOGINAPP_PATH, 
-    EMBEDDED_APP_NAME, EMBEDDED_APP_PATH, DISABLE_MFA,
+    EMBEDDED_APP_NAME, EMBEDDED_APP_PATH, DISABLE_MFA, LOCAL_DEPLOYMENT,
 
     MAIN_HTML: LOGINAPP_PATH+"/main.html",
     REROUTE_HTML: LOGINAPP_PATH+"/reroute.html",

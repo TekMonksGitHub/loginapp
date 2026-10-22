@@ -181,7 +181,9 @@ function startAutoLogoutTimer() { return;
 
 function isMfaDisabled() {
     const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
-    return urlObj.searchParams.get(LOGINAPP_CONSTANTS.DISABLE_MFA) === "true";
+    const disableMFA = urlObj.searchParams.get(LOGINAPP_CONSTANTS.DISABLE_MFA);
+    if(!disableMFA) return LOGINAPP_CONSTANTS.LOCAL_DEPLOYMENT ? true : false;  // disable MFA for local deployments, if the param is not specified.
+    return disableMFA.toLowerCase() == "true";
 }
 
 const interceptPageLoadData = _ => {
@@ -205,7 +207,7 @@ const _stopAutoLogoutTimer = _ => {
 
 export const loginmanager = {init, signin, reset, registerOrUpdate, logout, changepassword, startAutoLogoutTimer, 
     addLogoutListener, getProfileData, checkResetSecurity, getSessionUser, interceptPageLoadData, isAdmin,
-    signinWithGoogle,
+    signinWithGoogle, isMfaDisabled, 
     ID_OK: 1, ID_FAILED_EXISTS: -4, ID_FAILED_OTP: -5, ID_OK_NOT_YET_APPROVED: -1, 
     ID_INTERNAL_ERROR: -2, ID_DB_ERROR: -3, ID_OK_NOT_YET_VERIFIED: 2, ID_FAILED_PASSWORD: -6, ID_FAILED_MISSING: -7,
     ID_SECURITY_ERROR: -8, ID_DOMAIN_ERROR: -9};
