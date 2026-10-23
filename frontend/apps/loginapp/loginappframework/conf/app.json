@@ -1,5 +1,6 @@
 {
     "TIMEOUT": 600000,
+    "DISABLE_MFA_NOT_RECOMMENDED": false,
     "MIN_PASS_LENGTH": 8,
     "CSS_STYLETAG_START": "<style>",
     "CSS_STYLETAG_END": "</style>",

@@ -37,7 +37,7 @@ async function elementConnected(host) {
 	const memory = register_box.getMemory(host.id), type = host.getAttribute("type");
 	// Check if mfa should be disabled
 	const rawUrl = session.get($$.MONKSHU_CONSTANTS.PAGE_URL); const urlObj = new URL(rawUrl);
-    const hide_otp = urlObj.searchParams.get(LOGINAPP_CONSTANTS.DISABLE_MFA) === 'true'; memory.totpKey = _getTOTPRandomKey(); memory.type = type; memory.hide_otp = hide_otp;
+    const hide_otp = loginmanager.isMfaDisabled(); memory.totpKey = _getTOTPRandomKey(); memory.type = type; memory.hide_otp = hide_otp;
 	if (!hide_otp) { data.totpQRCodeData = await _getTOTPQRCode(memory.totpKey); data.totpURL = await _getTOTPURL(memory.totpKey); }
 
     data.hide_otp = hide_otp;
