@@ -16,5 +16,23 @@
     "id_blacklist_mode": true,
     "id_whitelist_mode": true,
     "transfer_token_timeout": 180000,
-    "jwt_iss": "login.tekmonks.com"
+    "jwt_iss": "login.tekmonks.com",
+    "ldap": {
+        "enabled": false,
+        "url": "ldaps://ldap.example.com:636",
+        "caFile": "/path/to/ca.pem",
+        "timeout": 5000,
+        "passwordMarker": "LDAP",
+        "baseDN": "dc=example,dc=com",
+        "userFilter": "(uid=${id})",
+        "serviceDN": "cn=svc-loginapp,ou=service,dc=example,dc=com",
+        "servicePassword": "<encrypted password>",
+        "nameAttribute": "cn",
+        "orgAttribute": "o",
+        "groupFilter": "(member=${dn})",
+        "groupRoles": [
+            {"group": "cn=Admins,ou=groups,dc=example,dc=com", "role": "admin"},
+            {"group": "cn=Users,ou=groups,dc=example,dc=com", "role": "user"}
+        ]
+    }
 }
