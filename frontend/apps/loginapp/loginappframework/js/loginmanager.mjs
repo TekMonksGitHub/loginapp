@@ -103,7 +103,7 @@ async function registerOrUpdate(old_id, name=session.get(LOGINAPP_CONSTANTS.USER
         LOG.error(`${isUpdate?"Update":"Registration"} failed for ${id} due to ${resp.reason}.`); 
         return resp.reason=="exists"?loginmanager.ID_FAILED_EXISTS:resp.reason=="otp"?loginmanager.ID_FAILED_OTP:
         resp.reason=="securityerror"?loginmanager.ID_SECURITY_ERROR:resp.reason=="domainerror"?loginmanager.ID_DOMAIN_ERROR:
-        loginmanager.ID_INTERNAL_ERROR;
+        resp.reason=="badpassword"?loginmanager.ID_FAILED_PASSWORD:loginmanager.ID_INTERNAL_ERROR;
     } else if (resp.result && resp.tokenflag) { // registration/update succeeded and JWT token is generated, so login can proceed
         session.set(LOGINAPP_CONSTANTS.USERID, id); 
         session.set(LOGINAPP_CONSTANTS.USERNAME, name);
