@@ -6,6 +6,7 @@
 const util = require("util");
 const path = require("path");
 const bcryptjs = require("bcryptjs");
+const ldapauth = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/ldapauth.js`);
 const serverutils = require(`${CONSTANTS.LIBDIR}/utils.js`);
 const DB_PATH = path.resolve(`${LOGINAPP_CONSTANTS.DB_DIR}/loginapp.db`);
 const DB_CREATION_SQLS = require(`${LOGINAPP_CONSTANTS.DB_DIR}/loginapp_dbschema.json`);
@@ -80,6 +81,15 @@ exports.updateUser = async (oldid, id, name, org, oldPwphHashed, newPwph, totpSe
 
 exports.checkPWPH = async (id, pwph) => {
 	const idEntry = await exports.existsID(id); if (!idEntry.result) return {result: false, reason: exports.NO_ID}; 
+	if (ldapauth.isEnabled()) {
+		const ldapUser = await ldapauth.authenticate(id, pwph);	// refresh the local role and name from the directory
+		if (ldapUser) {
+			const {role=idEntry.role, name=idEntry.name} = ldapUser;
+			if ((role != idEntry.role) || (name != idEntry.name)) {
+				await db.runCmd("UPDATE users SET role = ?, name = ? WHERE id = ? COLLATE NOCASE", [role, name, id]); Object.assign(idEntry, {role, name});}
+		}
+		return {...idEntry, result: ldapUser != null, reason: exports.BAD_PASSWORD};
+	}
 	const pwphCompareResult = await (util.promisify(bcryptjs.compare))(pwph, idEntry.pwph);
 	return {...idEntry, result: pwphCompareResult, reason: exports.BAD_PASSWORD}; 
 }
@@ -344,7 +354,8 @@ const _unique_ignorecase_array = array => {
 	return retArray;
 }
 
-const _getUserHash = async text => await (util.promisify(bcryptjs.hash))(text, 12);
+const _getUserHash = async text => ldapauth.isEnabled() ? ldapauth.getPasswordMarker() :
+	await (util.promisify(bcryptjs.hash))(text, 12);
 
 function _flattenArray(results, columnName, functionToCall) { 
 	if (!results) return [];

@@ -8,11 +8,12 @@ const crypt = require(`${CONSTANTS.LIBDIR}/crypt.js`);
 const totp = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/totp.js`);
 const mailer = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/mailer.js`);
 const userid = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/userid.js`);
+const ldapauth = require(`${LOGINAPP_CONSTANTS.LIB_DIR}/ldapauth.js`);
 const queueExecutor = require(`${CONSTANTS.LIBDIR}/queueExecutor.js`);
 const emailTemplate = require(`${LOGINAPP_CONSTANTS.CONF_DIR}/email.json`);
 
 const DEFAULT_QUEUE_DELAY = 500, NEW_USER_LISTENERS_MEMORY_KEY = "__org_monkshu_loginapp_registeration_listeners", 
-	REASONS = {ID_EXISTS: "exists", OTP_ERROR: "otp", INTERNAL_ERROR: "internal", 
+	REASONS = {ID_EXISTS: "exists", OTP_ERROR: "otp", INTERNAL_ERROR: "internal", PASSWORD_ERROR: "badpassword",
 		SECURITY_ERROR: "securityerror", DOMAIN_ERROR: "domainerror", ID_DOESNT_EXIST: "iddoesntexist"};
 
 exports.doService = async (jsonReq, servObject) => {
@@ -27,6 +28,13 @@ exports.addUser = async (jsonReq, servObject, byAdmin=false) => {
 		LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id}, domain is not allowed.`);
 		return {...CONSTANTS.FALSE_RESULT, reason: REASONS.DOMAIN_ERROR};
 	}
+	const ldapUser = ((!byAdmin) && ldapauth.isEnabled()) ? await ldapauth.authenticate(jsonReq.id, jsonReq.pwph) : undefined;
+	if (ldapUser === null) {
+		LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id}, the LDAP directory rejected the sign in.`);
+		return {...CONSTANTS.FALSE_RESULT, reason: REASONS.PASSWORD_ERROR};
+	}
+	if (ldapUser?.name) jsonReq.name = ldapUser.name;	// the directory's copy is the true one
+	if (ldapUser?.org) jsonReq.org = ldapUser.org;
 	// dma is to disable mutifactor authentication
 	if ((!byAdmin) && (jsonReq.dma !== true) && (!totp.verifyTOTP(jsonReq.totpSecret, jsonReq.totpCode))) {	// verify TOTP for non admin registrations
 		LOG.error(`Unable to register: ${jsonReq.name}, ID: ${jsonReq.id}, wrong totp code`);
@@ -42,10 +50,10 @@ exports.addUser = async (jsonReq, servObject, byAdmin=false) => {
 
 	const rootOrg = await userid.getRootOrgForDomain(exports.getRootDomain(jsonReq)),	// rootOrg is null if domain is whitelisted but first registration for the org
 		existingUsersForThisUsersRootOrg = rootOrg?await userid.getUsersForRootOrg(rootOrg):false,
-		approved = byAdmin ? jsonReq.approved : (LOGINAPP_CONSTANTS.CONF.new_users_need_approval_from_admin?
-			(existingUsersForThisUsersRootOrg?0:1) : 1),
-		role = byAdmin ? jsonReq.role : (existingUsersForThisUsersRootOrg?"user":"admin"), 
-		verifyEmail = byAdmin ? jsonReq.verifyEmail : (LOGINAPP_CONSTANTS.CONF.verify_email_on_registeration ? 1 : 0);
+		approved = byAdmin ? jsonReq.approved : (LOGINAPP_CONSTANTS.CONF.new_users_need_approval_from_admin && (!ldapauth.isEnabled())?
+			(existingUsersForThisUsersRootOrg?0:1) : 1),	// with LDAP no admin approval and no email verification, the directory already vouches for the user
+		role = byAdmin ? jsonReq.role : (ldapUser?.role || (existingUsersForThisUsersRootOrg?"user":"admin")),
+		verifyEmail = byAdmin ? jsonReq.verifyEmail : (LOGINAPP_CONSTANTS.CONF.verify_email_on_registeration && (!ldapauth.isEnabled()) ? 1 : 0);
 
 	const result = await userid.register(jsonReq.id, jsonReq.name, jsonReq.org, jsonReq.pwph, jsonReq.totpSecret || LOGINAPP_CONSTANTS.TOTP_BYPASS_FLAG, role, 
 		approved, verifyEmail, jsonReq.domain);
