@@ -1,0 +1,86 @@
+/*Copy the "ldap" section for your directory over the one in loginapp.json and change the example names.
+
+   enabled         - true turns LDAP login on, e.g. true
+   url             - address of the directory, it must start with ldaps://, e.g. ldaps://ldap.example.com:636
+   caFile          - file of the certificate authority which signed the directory's certificate, e.g. /etc/ssl/ldap-ca.pem
+   timeout         - how long to wait for the directory, in milliseconds, e.g. 5000
+   passwordMarker  - text saved instead of a password, e.g. LDAP
+   baseDN          - where the search starts, e.g. dc=example,dc=com
+   userFilter      - how to find the user, ${id} is the email typed at login, it must match one entry only, e.g. (userPrincipalName=${id}) or (cn=${id}) or (uid=${id})
+   serviceDN       - the account which searches the directory, use a plain account which can only search and read groups, not the administrator,
+                     e.g. cn=svc-loginapp,ou=service,dc=example,dc=com
+   servicePassword - its password, encrypted, e.g. 9899696e7f788b6f9c49d228a95b78
+   nameAttribute   - optional, field with the user's full name, saved instead of the typed name, e.g. displayName or cn
+   orgAttribute    - optional, field with the user's organization, saved instead of the typed one, e.g. company or o
+   groupFilter     - how to find the user's groups, ${dn} is the user's address, e.g. (member=${dn})
+   groupRoles      - group address and its role (admin or user), the first match wins, a user in no group is refused,
+                     e.g. {"group": "cn=Admins,ou=groups,dc=example,dc=com", "role": "admin"} */
+
+/* A DN is the full address of an entry, e.g. uid=user1,ou=staff,dc=example,dc=com
+   dc    - domain part, e.g. example.com is dc=example,dc=com
+   ou    - folder, e.g. ou=staff
+   o     - organization, e.g. o=Example
+   cn    - name of a person, group or account, e.g. cn=Admins or cn=user1
+   uid   - field with the login name, e.g. uid=user1
+   ${id} - the email typed at login, e.g. (userPrincipalName=${id}) becomes (userPrincipalName=user1@example.com)
+   ${dn} - the user's address found by userFilter, e.g. (member=${dn}) becomes (member=uid=user1,ou=staff,dc=example,dc=com)
+   To see an address, search for it, e.g. ldapsearch -x -H ldaps://host:636 -D <serviceDN> -w <password> -b <baseDN> "(uid=user1)" dn
+   To see the groups of that user, e.g. ldapsearch -x -H ldaps://host:636 -D <serviceDN> -w <password> -b <baseDN> "(member=uid=user1,ou=staff,dc=example,dc=com)" dn */
+
+/* Active Directory */
+    "ldap": {
+        "enabled": true,
+        "url": "ldaps://dc.corp.example.com:636",
+        "caFile": "/path/to/ca.pem",
+        "timeout": 5000,
+        "passwordMarker": "LDAP",
+        "baseDN": "dc=corp,dc=example,dc=com",
+        "userFilter": "(userPrincipalName=${id})",
+        "serviceDN": "cn=svc-loginapp,cn=Users,dc=corp,dc=example,dc=com",
+        "servicePassword": "<encrypted password>",
+        "nameAttribute": "displayName",
+        "orgAttribute": "company",
+        "groupFilter": "(member=${dn})",
+        "groupRoles": [
+            {"group": "cn=LoginApp-Admins,cn=Users,dc=corp,dc=example,dc=com", "role": "admin"},
+            {"group": "cn=LoginApp-Users,cn=Users,dc=corp,dc=example,dc=com", "role": "user"}
+        ]
+    }
+
+/* eDirectory: from the eDirectory documentation. A user has two names, cn and uid, use (uid=${id}) to log in with uid. Groups list their users in member. */
+    "ldap": {
+        "enabled": true,
+        "url": "ldaps://edir.example.com:636",
+        "caFile": "/path/to/ca.pem",
+        "timeout": 5000,
+        "passwordMarker": "LDAP",
+        "baseDN": "o=Example",
+        "userFilter": "(cn=${id})",
+        "serviceDN": "cn=svc-loginapp,ou=service,o=Example",
+        "servicePassword": "<encrypted password>",
+        "groupFilter": "(member=${dn})",
+        "groupRoles": [
+            {"group": "cn=Admins,ou=groups,o=Example", "role": "admin"},
+            {"group": "cn=Users,ou=groups,o=Example", "role": "user"}
+        ]
+    }
+
+/* OpenLDAP */
+    "ldap": {
+        "enabled": true,
+        "url": "ldaps://ldap.example.com:636",
+        "caFile": "/path/to/ca.pem",
+        "timeout": 5000,
+        "passwordMarker": "LDAP",
+        "baseDN": "dc=example,dc=com",
+        "userFilter": "(uid=${id})",
+        "serviceDN": "cn=svc-loginapp,ou=service,dc=example,dc=com",
+        "servicePassword": "<encrypted password>",
+        "nameAttribute": "cn",
+        "orgAttribute": "o",
+        "groupFilter": "(member=${dn})",
+        "groupRoles": [
+            {"group": "cn=Admins,ou=groups,dc=example,dc=com", "role": "admin"},
+            {"group": "cn=Users,ou=groups,dc=example,dc=com", "role": "user"}
+        ]
+    }
