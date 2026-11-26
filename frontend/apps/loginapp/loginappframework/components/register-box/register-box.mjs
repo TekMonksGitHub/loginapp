@@ -41,6 +41,7 @@ async function elementConnected(host) {
 	if (!hide_otp) { data.totpQRCodeData = await _getTOTPQRCode(memory.totpKey); data.totpURL = await _getTOTPURL(memory.totpKey); }
 
     data.hide_otp = hide_otp;
+	data.ldap = LOGINAPP_CONSTANTS.LDAP === true && type != "reset" && type != "initial";
 	data.AuthenticatorMsg = await i18n.get(type == "reset"?"ResetAuthenticatorMsg":"DownloadAuthenticatorMsg");
 	data.Password = await i18n.get(type == "reset"?"NewPassword":"Password");
 	data.PasswordAgain = await i18n.get(type == "reset"?"NewPasswordAgain":"PasswordAgain");
@@ -97,6 +98,7 @@ async function registerOrUpdate(element) {
 		case loginmanager.ID_INTERNAL_ERROR: shadowRoot.querySelector("span#errorInternal").classList.add("errorvisible"); break;
 		case loginmanager.ID_SECURITY_ERROR: shadowRoot.querySelector("span#errorSecurity").classList.add("errorvisible"); break;
 		case loginmanager.ID_DOMAIN_ERROR: shadowRoot.querySelector("span#errorDomain").classList.add("errorvisible"); break;
+		case loginmanager.ID_FAILED_PASSWORD: shadowRoot.querySelector("span#errorPassword").classList.add("errorvisible"); break;
 		default: shadowRoot.querySelector("span#errorInternal").classList.add("errorvisible"); break;
 	}
 }
@@ -126,7 +128,7 @@ function _validateForm(shadowRoot) {
 	if (!name.checkValidity()) {name.reportValidity(); return false;}
 	if (!id.checkValidity()) {id.reportValidity(); return false;}
 	if (!pass1.checkValidity()) {pass1.reportValidity(); return false;}
-	if (!pass2.checkValidity()) {pass2.reportValidity(); return false;}
+	if (pass2 && !pass2.checkValidity()) {pass2.reportValidity(); return false;}
 	if (!org.checkValidity()) {org.reportValidity(); return false;}
 	if (otp && !otp.checkValidity()) {otp.reportValidity(); return false;}
 	if (!_doPasswordsMatch(shadowRoot)) {shadowRoot.querySelector("span#errorPasswordMismatch").classList.add("errorvisible"); return false;}
@@ -136,7 +138,7 @@ function _validateForm(shadowRoot) {
 
 function _doPasswordsMatch(shadowRoot) {
 	const pass1 = shadowRoot.querySelector("password-box#pass1"), pass2 = shadowRoot.querySelector("password-box#pass2")
-	return pass1.value == pass2.value;
+	return pass2 ? pass1.value == pass2.value : true;
 }
 
 function _getTOTPRandomKey() {
@@ -169,6 +171,7 @@ function _resetUI(shadowRoot) {
 	shadowRoot.querySelector("span#errorSecurity").classList.remove("errorvisible");
 	shadowRoot.querySelector("span#errorInternal").classList.remove("errorvisible");
 	shadowRoot.querySelector("span#errorDomain").classList.remove("errorvisible");
+	shadowRoot.querySelector("span#errorPassword").classList.remove("errorvisible");
 	_hideWait(shadowRoot);
 }
 
