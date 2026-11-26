@@ -57,7 +57,7 @@ button:hover {
     transition: all 0.3s ease;
 }
 
-span#errorExists, span#errorOTP, span#errorInternal, span#errorPasswordMismatch , span#errorSecurity, span#errorDomain {
+span#errorExists, span#errorOTP, span#errorInternal, span#errorPasswordMismatch , span#errorSecurity, span#errorDomain, span#errorPassword {
     color: #e40000;
     display: none;
 }
@@ -136,6 +136,7 @@ span.errorvisible {display: flex !important;}
 <span id="errorInternal">{{i18n.RegisterErrorInternal}}</span>
 <span id="errorDomain">{{i18n.RegisterErrorDomain}}</span>
 <span id="errorPasswordMismatch">{{i18n.RegisterErrorPasswordMismatch}}</span>
+<span id="errorPassword">{{i18n.RegisterErrorPassword}}</span>
 <span id="spinner"><img id="spinner" src="{{{COMPONENT_PATH}}}/img/spinner.svg"></span>
 
 <input type="text" id="name" placeholder="{{i18n.Name}}" value="{{name}}" required spellcheck="false"
@@ -148,12 +149,13 @@ span.errorvisible {display: flex !important;}
     oninput="setCustomValidity(''); monkshu_env.components['register-box'].updateOrgDataList(this.value, this.nextElementSibling)" 
     list="orgsearchlist" autocomplete="off" {{#reset}}readonly{{/reset}} {{#initial}}readonly{{/initial}}>
 <datalist id="orgsearchlist"></datalist>
-<span id="password">
-    <password-box style="width:45%; padding: 10px 0px 10px 0px; height: 2em;" id="pass1" placeholder="{{Password}}" 
-        required="true" minlength="{{minlength}}" customValidity="{{i18n.FillField}}"></password-box>
-    <password-box style="width:45%; padding: 10px 0px 10px 0px; height: 2em;" id="pass2" placeholder="{{PasswordAgain}}" 
+<span id="password"{{#ldap}} style="width: 90%;"{{/ldap}}>
+    <password-box style="width:{{#ldap}}100%{{/ldap}}{{^ldap}}45%{{/ldap}}; padding: 10px 0px 10px 0px; height: 2em;" id="pass1" placeholder="{{Password}}"
         required="true" minlength="{{minlength}}" customValidity="{{i18n.FillField}}"
-        {{#hide_otp}}onkeyup="if (event.keyCode == 13) monkshu_env.components['register-box'].getShadowRootByContainedElement(this).querySelector('#submit').click();"{{/hide_otp}}></password-box>
+        {{#ldap}}{{#hide_otp}}onkeyup="if (event.keyCode == 13) monkshu_env.components['register-box'].getShadowRootByContainedElement(this).querySelector('#submit').click();"{{/hide_otp}}{{/ldap}}></password-box>
+    {{^ldap}}<password-box style="width:45%; padding: 10px 0px 10px 0px; height: 2em;" id="pass2" placeholder="{{PasswordAgain}}"
+        required="true" minlength="{{minlength}}" customValidity="{{i18n.FillField}}"
+        {{#hide_otp}}onkeyup="if (event.keyCode == 13) monkshu_env.components['register-box'].getShadowRootByContainedElement(this).querySelector('#submit').click();"{{/hide_otp}}></password-box>{{/ldap}}
 </span>
 {{^hide_otp}}
 <span id="otp">

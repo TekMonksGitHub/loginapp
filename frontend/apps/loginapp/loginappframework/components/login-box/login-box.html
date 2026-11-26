@@ -97,10 +97,10 @@ img#spinner {height: 2em; width: 2em;}
 {{{styleBody}}}
 
 <div id="container">
-<span id="errorPassword">{{i18n.BadLoginPassword}}&nbsp;<span id="resetaccount" onclick="monkshu_env.components['login-box'].resetAccount(this)">{{i18n.LoginReset}}</span></span>
+<span id="errorPassword">{{i18n.BadLoginPassword}}{{^ldap}}&nbsp;<span id="resetaccount" onclick="monkshu_env.components['login-box'].resetAccount(this)">{{i18n.LoginReset}}</span>{{/ldap}}</span>
 <span id="errorMissingID">{{i18n.BadLoginID}}</span>
 <span id="errorDomain">{{i18n.BadLoginDomain}}</span>
-<span id="errorOTP">{{i18n.BadLoginOTP}}&nbsp;<span id="resetaccount" onclick="monkshu_env.components['login-box'].resetAccount(this)">{{i18n.LoginReset}}</span></span>
+<span id="errorOTP">{{i18n.BadLoginOTP}}{{^ldap}}&nbsp;<span id="resetaccount" onclick="monkshu_env.components['login-box'].resetAccount(this)">{{i18n.LoginReset}}</span>{{/ldap}}</span>
 <span id="errorGeneric">{{i18n.BadLoginInternal}}</span>
 <span id="spinner"><img id="spinner" src="{{{COMPONENT_PATH}}}/img/spinner.svg"></span>
 
