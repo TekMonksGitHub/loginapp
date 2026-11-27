@@ -12,6 +12,7 @@ export const i18n = {
 "RegisterErrorOTP": "The one time code is wrong.",
 "RegisterErrorExists": "The email is already registered.",
 "RegisterErrorPasswordMismatch": "Passwords don't match.",
+"RegisterErrorPassword": "組織のディレクトリがこの情報を受け付けませんでした。IDとパスワードを確認するか、管理者にアクセス権を依頼してください。",
 "RegisterErrorSecurity": "Security error, please contact your company's administrator for help.",
 "RegisterErrorInternal": "Internal error, please retry later or contact your company's administrator for help.",
 "RegisterErrorDomain": "This email domain is not allowed. Please retry with a different email.",

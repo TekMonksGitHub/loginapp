@@ -89,6 +89,8 @@ span#resetaccount:hover {
     cursor: default;
 }
 
+div#container.ldap span#resetaccount {display: none;}
+
 span#spinner {visibility: hidden;}
 span#spinner.visible {visibility: visible;}
 img#spinner {height: 2em; width: 2em;}
@@ -96,7 +98,7 @@ img#spinner {height: 2em; width: 2em;}
 
 {{{styleBody}}}
 
-<div id="container">
+<div id="container" {{#ldap}}class="ldap"{{/ldap}}>
 <span id="errorPassword">{{i18n.BadLoginPassword}}&nbsp;<span id="resetaccount" onclick="monkshu_env.components['login-box'].resetAccount(this)">{{i18n.LoginReset}}</span></span>
 <span id="errorMissingID">{{i18n.BadLoginID}}</span>
 <span id="errorDomain">{{i18n.BadLoginDomain}}</span>
